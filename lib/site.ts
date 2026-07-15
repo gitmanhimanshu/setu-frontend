@@ -191,13 +191,14 @@ export const TOOLS: Tool[] = [
   {
     name: "send_application",
     purpose:
-      "Sends one email from your Gmail. Irreversible. Refuses if no role is set, if the role needs a link and none is saved, if the free allowance is spent, or if the daily limit is reached. Your link is appended automatically.",
+      "Sends one email from your Gmail — any email, not only applications: meeting requests, follow-ups, greetings. Irreversible. Refuses if no role is set, if the role needs a link and none is saved, if the free allowance is spent, or if the daily limit is reached. Your link is appended by default; include_link=false leaves it off.",
     input: [
       { name: "to", type: "string", required: true, desc: "Recipient address" },
       { name: "subject", type: "string", required: true, desc: "Subject line" },
       { name: "body", type: "string", required: true, desc: "Plain text body" },
       { name: "company", type: "string", required: false, desc: "For your history" },
       { name: "source_url", type: "string", required: false, desc: "Where the address came from" },
+      { name: "include_link", type: "bool", required: false, desc: "Default true. false = don't append your saved link (general messages)" },
     ],
     output: "success, to, subject, message_id — or success:false with error",
     example: `{
@@ -211,7 +212,7 @@ export const TOOLS: Tool[] = [
   {
     name: "send_applications",
     purpose:
-      "Sends a batch, pausing between each so Gmail doesn't read the run as automated. Capped at 25 per call, so you review as you go instead of finding out afterwards.",
+      "Sends a batch of emails — applications or any other kind — pausing between each so Gmail doesn't read the run as automated. Capped at 25 per call, so you review as you go instead of finding out afterwards.",
     input: [
       {
         name: "applications",
@@ -224,6 +225,12 @@ export const TOOLS: Tool[] = [
         type: "int",
         required: false,
         desc: "Pause between sends. Defaults to the server's EMAIL_DELAY (5s)",
+      },
+      {
+        name: "include_link",
+        type: "bool",
+        required: false,
+        desc: "Default true. false = don't append your saved link to any message in the batch",
       },
     ],
     output: "sent, failed, skipped, skipped_details[], results[], remaining_today",
