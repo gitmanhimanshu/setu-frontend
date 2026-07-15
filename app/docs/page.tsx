@@ -72,13 +72,73 @@ export default function Docs() {
             />
           </div>
 
-          <H3>Cursor, VS Code, Windsurf, Cline</H3>
-          <p className="mt-3 text-[var(--text-secondary)] leading-relaxed">
-            These clients accept a remote MCP server with OAuth; add the same URL
-            wherever the client asks for one. We haven&apos;t verified each of
-            them ourselves, so if one misbehaves, please open an issue — that is
-            useful to us.
+          <H3>VS Code</H3>
+          <p className="mt-3 text-ink-2 leading-relaxed">
+            VS Code (Copilot agent mode) supports remote MCP servers with OAuth
+            natively. Add this to <Code>.vscode/mcp.json</Code> in your
+            project, or to your user-level <Code>mcp.json</Code>:
           </p>
+          <div className="mt-3">
+            <CodeBlock
+              lang="json"
+              filename=".vscode/mcp.json"
+              code={`{
+  "servers": {
+    "setu": { "type": "http", "url": "${MCP_URL}" }
+  }
+}`}
+            />
+          </div>
+          <p className="mt-3 text-sm text-ink-2 leading-relaxed">
+            On first use, a browser opens for Google sign-in — the same flow as
+            Claude.
+          </p>
+
+          <H3>Windsurf</H3>
+          <p className="mt-3 text-ink-2 leading-relaxed">
+            Windsurf supports remote MCP servers with OAuth. Add this to{" "}
+            <Code>~/.codeium/windsurf/mcp_config.json</Code> (Windows:{" "}
+            <Code>%USERPROFILE%\.codeium\windsurf\mcp_config.json</Code>):
+          </p>
+          <div className="mt-3">
+            <CodeBlock
+              lang="json"
+              filename="mcp_config.json"
+              code={`{
+  "mcpServers": {
+    "setu": { "serverUrl": "${MCP_URL}" }
+  }
+}`}
+            />
+          </div>
+
+          <H3>Antigravity</H3>
+          <p className="mt-3 text-ink-2 leading-relaxed">
+            Antigravity&apos;s native OAuth for remote MCP servers is currently
+            broken (it sends the initialize request without the bearer token).
+            Until that&apos;s fixed, connect through the{" "}
+            <Code>mcp-remote</Code> bridge, which handles the Google sign-in
+            locally. Settings → Customizations → <B>Open MCP Config</B>:
+          </p>
+          <div className="mt-3">
+            <CodeBlock
+              lang="json"
+              filename="mcp_config.json"
+              code={`{
+  "mcpServers": {
+    "setu": {
+      "command": "npx",
+      "args": ["mcp-remote", "${MCP_URL}"]
+    }
+  }
+}`}
+            />
+          </div>
+          <Note>
+            The <Code>mcp-remote</Code> bridge works in any MCP client whose
+            built-in OAuth misbehaves — Cursor and Cline included. Requires
+            Node.js installed.
+          </Note>
         </section>
 
         {/* The warning */}
