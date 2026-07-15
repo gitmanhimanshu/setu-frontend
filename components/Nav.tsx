@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import Logo from "./Logo";
-import { AUTHOR, GITHUB_URL } from "@/lib/site";
+import { AUTHOR } from "@/lib/site";
 import { cn } from "@/lib/cn";
 
 const links = [

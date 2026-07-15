@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { AUTHOR, GITHUB_URL, SITE_URL } from "@/lib/site";
+import { AUTHOR, SITE_URL } from "@/lib/site";
 
 const description =
   "Setu is an AI-powered Model Context Protocol (MCP) server that lets Claude, ChatGPT, and Cursor automate job applications directly from your Gmail. 100% secure, send-only access.";
@@ -47,8 +47,8 @@ export const metadata: Metadata = {
   alternates: { canonical: SITE_URL },
 };
 
-/* JSON-LD describes only what's verifiable: the software, its license, and who
-   wrote it. No invented ratings or review counts. */
+/* JSON-LD describes only what's verifiable: the software and who wrote it.
+   No invented ratings or review counts. */
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
@@ -57,8 +57,6 @@ const jsonLd = {
   operatingSystem: "Any",
   description,
   url: SITE_URL,
-  codeRepository: GITHUB_URL,
-  license: "https://opensource.org/licenses/MIT",
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD", description: "Free for first 5 emails" },
   author: {
     "@type": "Person",

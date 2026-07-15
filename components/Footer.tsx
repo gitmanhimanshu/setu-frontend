@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Logo from "./Logo";
-import { AUTHOR, CONTACT_EMAIL, GITHUB_URL, MIMANASA, TAGLINE } from "@/lib/site";
+import { AUTHOR, CONTACT_EMAIL, MIMANASA, TAGLINE } from "@/lib/site";
 
 /* Only routes that actually exist. A dead link in a footer is the fastest way to
    look unfinished — add entries here as the pages land, not before. */

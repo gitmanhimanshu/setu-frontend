@@ -20,7 +20,7 @@ import Logo from "@/components/Logo";
 import { AnimatedTerminal } from "@/components/CodeWindow";
 import Faq from "@/components/Faq";
 import Reveal from "@/components/Reveal";
-import { CLIENTS, GITHUB_URL, LIMITS, MCP_URL, TAGLINE } from "@/lib/site";
+import { CLIENTS, LIMITS, MCP_URL, TAGLINE } from "@/lib/site";
 
 const features = [
   {
@@ -62,11 +62,6 @@ const features = [
     icon: KeyRound,
     title: "OAuth, no passwords",
     body: "You sign in on Google's page. Setu never sees a password, and stores no token — the OAuth layer issues a fresh one per request.",
-  },
-  {
-    icon: Terminal,
-    title: "Open source",
-    body: "Server, desktop version, and this site are all in the repo. Self-host with your own Google credentials if you'd rather.",
   },
 ];
 
@@ -148,14 +143,6 @@ export default function Home() {
                 Get started
                 <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
               </Link>
-              <a
-                href={GITHUB_URL}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[var(--border)] bg-[var(--surface)] font-medium hover:border-[var(--border-strong)] transition-colors"
-              >
-                GitHub
-              </a>
             </div>
 
             <p className="mt-6 text-sm text-[var(--text-muted)]">
