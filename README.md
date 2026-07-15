@@ -20,7 +20,7 @@ npm run dev                          # http://localhost:3000
 ## Env
 
 ```env
-NEXT_PUBLIC_SETU_URL=https://setu-production.up.railway.app
+NEXT_PUBLIC_SETU_URL=https://api.mimanasa.online
 ```
 
 Ye do jagah use hota hai: `/connect` pe dikhne wala connector URL, aur dashboard
