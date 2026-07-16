@@ -8,6 +8,7 @@ import {
   KeyRound,
   Layers,
   MailCheck,
+  Reply,
   ShieldOff,
   Sparkles,
   Terminal,
@@ -62,6 +63,11 @@ const features = [
     icon: KeyRound,
     title: "OAuth, no passwords",
     body: "You sign in on Google's page. Setu never sees a password, and stores no token — the OAuth layer issues a fresh one per request.",
+  },
+  {
+    icon: Reply,
+    title: "Smart Follow-ups",
+    body: "Since your send history is safely logged, you can effortlessly ask the AI to draft and send follow-up messages to previous contacts.",
   },
 ];
 
