@@ -129,15 +129,19 @@ export default function Home() {
               Opportunity.
             </h1>
 
+            <h2 className="mt-5 text-xl sm:text-2xl font-medium text-[var(--text-primary)] tracking-tight">
+              The 100% Open-Source Email MCP Server
+            </h2>
+
             <p
               lang="hi"
-              className="mt-5 text-lg text-[var(--accent)] leading-relaxed"
+              className="mt-4 text-lg text-[var(--accent)] leading-relaxed"
             >
               {TAGLINE.hi}
             </p>
 
             <p className="mt-4 text-lg text-[var(--text-secondary)] leading-relaxed max-w-xl">
-              Setu is a fully open-source MCP server that lets Claude, ChatGPT, or Cursor send email outreach and applications directly from your own Gmail — researched by the assistant, and approved by you before it leaves.
+              Setu is a free, fully open-source MCP server that lets Claude, ChatGPT, or Cursor send email outreach and applications directly from your own Gmail — researched by the assistant, and approved by you before it leaves.
             </p>
 
             <div className="mt-9 flex flex-wrap gap-3">
