@@ -190,6 +190,7 @@ function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
   const [users, setUsers] = useState<AdminUser[] | null>(null);
   const [visitors, setVisitors] = useState<VisitorsData | null>(null);
   const [vpage, setVpage] = useState(1);
+  const [tab, setTab] = useState<"users" | "visitors">("users");
   const [error, setError] = useState<string | null>(null);
   const [busySub, setBusySub] = useState<string | null>(null);
 
@@ -311,8 +312,21 @@ function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
         </>
       )}
 
-      <section className="mt-12">
-        <h2 className="text-xl font-semibold tracking-tight">Users</h2>
+      <div
+        role="tablist"
+        aria-label="Admin sections"
+        className="mt-12 inline-flex items-center gap-0.5 p-0.5 rounded-full border border-[var(--border)] bg-[var(--surface)]"
+      >
+        <TabButton active={tab === "users"} onClick={() => setTab("users")}>
+          Users{users ? ` (${users.length})` : ""}
+        </TabButton>
+        <TabButton active={tab === "visitors"} onClick={() => setTab("visitors")}>
+          Visitors{visitors ? ` (${visitors.unique_ips})` : ""}
+        </TabButton>
+      </div>
+
+      <section className="mt-6" hidden={tab !== "users"}>
+        <h2 className="sr-only">Users</h2>
         {!users ? (
           <p className="mt-4 text-sm text-ink-2">Loading…</p>
         ) : users.length === 0 ? (
@@ -386,11 +400,11 @@ function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
         )}
       </section>
 
-      <section className="mt-14">
+      <section className="mt-6" hidden={tab !== "visitors"}>
         <div className="flex items-end justify-between gap-4 flex-wrap">
           <div>
-            <h2 className="text-xl font-semibold tracking-tight">Visitors</h2>
-            <p className="mt-1 text-sm text-ink-2">
+            <h2 className="sr-only">Visitors</h2>
+            <p className="text-sm text-ink-2">
               Everyone who&apos;s opened the site, newest first. Repeat visits
               from the same IP add to the count rather than a new row.
             </p>
@@ -493,6 +507,31 @@ function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
         )}
       </section>
     </main>
+  );
+}
+
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      role="tab"
+      aria-selected={active}
+      onClick={onClick}
+      className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+        active
+          ? "bg-[var(--surface-2)] text-[var(--text-primary)]"
+          : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 
