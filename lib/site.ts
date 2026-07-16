@@ -9,7 +9,7 @@ export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://setu.mimamsa.dev";
 
 export const GITHUB_URL =
-  process.env.NEXT_PUBLIC_GITHUB_URL ?? "https://github.com/gitmanhimanshu/setu";
+  process.env.NEXT_PUBLIC_GITHUB_URL ?? "https://github.com/gitmanhimanshu/Email_automation";
 
 export const CONTACT_EMAIL = "himanshuyada70@gmail.com";
 

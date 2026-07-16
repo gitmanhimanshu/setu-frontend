@@ -13,6 +13,7 @@ import {
   Sparkles,
   Terminal,
   UserCheck,
+  Github,
 } from "lucide-react";
 import Architecture from "@/components/Architecture";
 import Aurora from "@/components/Aurora";
@@ -21,7 +22,7 @@ import Logo from "@/components/Logo";
 import { AnimatedTerminal } from "@/components/CodeWindow";
 import Faq from "@/components/Faq";
 import Reveal from "@/components/Reveal";
-import { CLIENTS, LIMITS, MCP_URL, TAGLINE } from "@/lib/site";
+import { CLIENTS, LIMITS, MCP_URL, TAGLINE, GITHUB_URL } from "@/lib/site";
 
 const features = [
   {
@@ -149,6 +150,15 @@ export default function Home() {
                 Get started
                 <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
               </Link>
+              <a
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] font-medium hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] transition-all"
+              >
+                <Github size={15} />
+                Open Source
+              </a>
             </div>
 
             <p className="mt-6 text-sm text-[var(--text-muted)]">
