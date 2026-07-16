@@ -117,9 +117,9 @@ export default function Home() {
                 background wordmark is decoration and is aria-hidden. */}
             <h1 className="mt-5 text-4xl sm:text-6xl font-semibold tracking-tight leading-[1.03]">
               <span className="sr-only">Setu — </span>
-              Connect AI to Gmail
+              Bridge AI to
               <br />
-              in minutes.
+              Opportunity.
             </h1>
 
             <p
