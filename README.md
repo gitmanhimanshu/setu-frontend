@@ -1,5 +1,7 @@
 # Setu — Frontend
 
+**Live:** [setu.mimanasa.online](https://setu.mimanasa.online) · Backend/MCP server: [Email_automation](https://github.com/gitmanhimanshu/Email_automation)
+
 Next.js 15 (App Router) + Tailwind 4. Landing page, developer connect docs, aur
 dashboard.
 
@@ -68,3 +70,7 @@ Kuch rules jo todna nahi:
   figures use karte hain, warna `121` jaisa number display size pe dhila lagta hai
 - **Wide content apne container mein scroll kare** (`.scroll-x`) — page body kabhi
   horizontally scroll na kare
+
+## License
+
+[MIT](LICENSE) © 2026 Himanshu Yadav
