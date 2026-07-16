@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import Logo from "./Logo";
-import { AUTHOR } from "@/lib/site";
+import { AUTHOR, GITHUB_URL } from "@/lib/site";
 import { cn } from "@/lib/cn";
 
 const links = [
@@ -38,6 +38,9 @@ export default function Nav() {
         scrolled && "shadow-[0_1px_0_var(--border)]"
       )}
     >
+      <div className="bg-[var(--text-primary)] text-[var(--plane)] text-center py-2.5 px-4 text-sm font-medium">
+        🎉 Setu is now 100% Open-Source! <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="underline underline-offset-4 hover:opacity-80 transition-opacity font-semibold ml-1">Star us on GitHub</a>
+      </div>
       <div className="glass border-b border-[var(--border)]">
         <nav className="mx-auto max-w-6xl px-6 h-14 flex items-center justify-between gap-4">
           <Link
