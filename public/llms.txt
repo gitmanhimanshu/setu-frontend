@@ -1,0 +1,38 @@
+# Setu - Connect AI to Gmail in minutes
+
+Setu is an AI-powered Model Context Protocol (MCP) server that lets Claude, ChatGPT, Cursor, and other AI assistants automate email outreach directly from your Gmail. It is built for everyone, supporting 3 specific roles: Job Seekers (for job applications), Recruiters (for candidate outreach), and Professionals (for client/partner outreach).
+
+## Overview
+- **Core Function:** Sends personalized emails (applications, outreach, follow-ups) crafted by your AI assistant from your actual Gmail account.
+- **Security:** 100% secure. It strictly uses the `gmail.send` scope. It cannot read your inbox. Google handles the OAuth login; Setu never sees or stores passwords, nor does it store tokens at rest.
+- **Workflow:** You add the Setu MCP URL to your assistant, sign in with Google once, paste your relevant link (resume, job description, or portfolio), and then ask the AI to do your outreach. The AI researches, drafts the emails, asks for your approval, and Setu sends them with paced delivery and deduplication.
+
+## Features & Limits
+- **Paced Sending:** Adds a 5-second gap between emails by default so Gmail doesn't flag it as automation.
+- **Rate Limits:** Enforced by the server—80 emails per day and 25 per batch call.
+- **Link Verification:** Requires a publicly accessible link (e.g., Google Drive Resume). Setu verifies the link is public before sending to prevent broken applications.
+- **Duplicate Prevention:** Setu logs sent emails and prevents duplicate sends.
+- **Roles:** You can set your role as `job_seeker` (requires resume), `recruiter` (JD optional), or `professional` (portfolio optional).
+
+## Getting Started / Installation
+Add the connector URL to your MCP-compatible client:
+URL: `https://api.mimanasa.online/mcp`
+
+- **Claude:** Settings → Connectors → Add custom connector → Paste URL.
+- **ChatGPT:** Settings → Connectors → Advanced (Developer mode) → Create → Set auth to OAuth.
+- **Claude Code:** `claude mcp add --transport http setu https://api.mimanasa.online/mcp`
+- **VS Code:** Add to `mcp.json` `{"servers": {"setu": {"type": "http", "url": "https://api.mimanasa.online/mcp"}}}`
+
+## MCP Tools Provided
+Setu provides the following tools to the AI assistant:
+1. `get_my_profile`: Fetch user profile, role, saved link, plan, and remaining quota.
+2. `set_role`: Set the user's role (`job_seeker`, `recruiter`, `professional`).
+3. `save_link`: Saves the URL appended to every email (e.g., resume).
+4. `verify_hr_emails`: Checks if an address's domain can actually receive mail (MX records).
+5. `send_application`: Sends one email from Gmail.
+6. `send_applications`: Sends a batch of emails (max 25).
+7. `get_sent_history`: Retrieves the user's send history to avoid duplicates.
+
+## Pricing
+- **Free Plan:** First 5 successful emails are free to test.
+- **Pro Plan:** $5/month for unlimited emails (up to Gmail's daily limits).

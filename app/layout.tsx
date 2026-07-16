@@ -6,12 +6,12 @@ import VisitTracker from "@/components/VisitTracker";
 import { AUTHOR, SITE_URL } from "@/lib/site";
 
 const description =
-  "Setu is an AI-powered Model Context Protocol (MCP) server that lets Claude, ChatGPT, and Cursor automate job applications directly from your Gmail. 100% secure, send-only access.";
+  "Setu is an AI-powered Model Context Protocol (MCP) server that lets Claude, ChatGPT, and Cursor automate email outreach directly from your Gmail. Built for job seekers, recruiters, and professionals. 100% secure, send-only access.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Setu — Automate Job Applications with AI via Gmail MCP",
+    default: "Setu — Automate Email Outreach with AI via Gmail MCP",
     template: "%s | Setu AI Assistant",
   },
   description,
@@ -20,8 +20,9 @@ export const metadata: Metadata = {
   publisher: AUTHOR.name,
   authors: [{ name: AUTHOR.name, url: AUTHOR.github }],
   keywords: [
-    "AI job application sender",
+    "AI email outreach sender",
     "Automate job search with AI",
+    "Automate recruiting with AI",
     "Send emails with Claude",
     "Claude MCP for Gmail",
     "ChatGPT MCP email sender",
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
     "MCP server",
     "Gmail API AI automation",
     "Cursor AI Gmail connector",
-    "Automated resume sender",
+    "Automated outreach sender",
   ],
   openGraph: {
     type: "website",
@@ -82,6 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs Context" />
       </head>
       <body className="min-h-screen antialiased">
         <a
