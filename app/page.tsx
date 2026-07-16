@@ -102,7 +102,7 @@ export default function Home() {
           <div>
             <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)]">
               <Sparkles size={12} className="text-[var(--accent)]" />
-              Model Context Protocol server
+              100% Open-Source MCP Server
             </span>
 
             <div className="mt-7 flex items-center gap-3">
@@ -137,9 +137,7 @@ export default function Home() {
             </p>
 
             <p className="mt-4 text-lg text-[var(--text-secondary)] leading-relaxed max-w-xl">
-              Setu is an MCP server that lets Claude, ChatGPT, or Cursor send job
-              applications from your own Gmail — researched by the assistant,
-              written for the actual posting, approved by you before it leaves.
+              Setu is a fully open-source MCP server that lets Claude, ChatGPT, or Cursor send email outreach and applications directly from your own Gmail — researched by the assistant, and approved by you before it leaves.
             </p>
 
             <div className="mt-9 flex flex-wrap gap-3">
