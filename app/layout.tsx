@@ -6,7 +6,7 @@ import VisitTracker from "@/components/VisitTracker";
 import { AUTHOR, SITE_URL } from "@/lib/site";
 
 const description =
-  "Setu is an AI-powered Model Context Protocol (MCP) server that lets Claude, ChatGPT, and Cursor automate email outreach directly from your Gmail. Built for job seekers, recruiters, and professionals. 100% secure, send-only access.";
+  "Setu is an AI-powered Model Context Protocol (MCP) server that lets Claude, ChatGPT, and Cursor automate email outreach and follow-ups directly from your Gmail. Built for job seekers, recruiters, and professionals. 100% secure, send-only access.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -23,6 +23,8 @@ export const metadata: Metadata = {
     "AI email outreach sender",
     "Automate job search with AI",
     "Automate recruiting with AI",
+    "Automate email follow-ups",
+    "AI follow-up sender",
     "Send emails with Claude",
     "Claude MCP for Gmail",
     "ChatGPT MCP email sender",
