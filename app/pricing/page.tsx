@@ -27,7 +27,7 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "$9",
+    price: "$5",
     period: "per month",
     description: "For a real search, or real outreach. Manual upgrade for now — payment gateway coming.",
     features: [

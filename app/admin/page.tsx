@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { LogOut, RefreshCw, ShieldCheck } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogOut, MapPin, RefreshCw, ShieldCheck } from "lucide-react";
 import Logo from "@/components/Logo";
 import { HeroFigure, StatTile, StatusPill } from "@/components/StatTile";
 import { SETU_URL } from "@/lib/site";
@@ -32,6 +32,28 @@ type AdminUser = {
   failed: number;
   sent_24h: number;
   last_sent_at: string | null;
+};
+
+type Visitor = {
+  ip: string;
+  country: string | null;
+  region: string | null;
+  city: string | null;
+  org: string | null;
+  path: string | null;
+  user_agent: string | null;
+  visit_count: number;
+  first_seen: string;
+  last_seen: string;
+};
+
+type VisitorsData = {
+  visitors: Visitor[];
+  total: number;
+  unique_ips: number;
+  total_hits: number;
+  page: number;
+  pages: number;
 };
 
 const CREDS_KEY = "setu_admin";
@@ -166,6 +188,8 @@ function Login({ onLogin }: { onLogin: (creds: string) => void }) {
 function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [users, setUsers] = useState<AdminUser[] | null>(null);
+  const [visitors, setVisitors] = useState<VisitorsData | null>(null);
+  const [vpage, setVpage] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [busySub, setBusySub] = useState<string | null>(null);
 
@@ -184,9 +208,22 @@ function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
     }
   }, [creds, onLogout]);
 
+  const loadVisitors = useCallback(async () => {
+    try {
+      setVisitors(await adminGet(`/admin/api/visitors?page=${vpage}`, creds));
+    } catch (err) {
+      if (err instanceof Error && err.message === "unauthorized") return onLogout();
+      setError(err instanceof Error ? err.message : "Could not load visitors.");
+    }
+  }, [creds, vpage, onLogout]);
+
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    loadVisitors();
+  }, [loadVisitors]);
 
   async function changePlan(sub: string, plan: "free" | "pro") {
     setBusySub(sub);
@@ -220,7 +257,10 @@ function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={load}
+            onClick={() => {
+              load();
+              loadVisitors();
+            }}
             className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-sm font-medium hover:border-[var(--border-strong)] transition-colors"
           >
             <RefreshCw size={14} />
@@ -343,6 +383,113 @@ function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
               </tbody>
             </table>
           </div>
+        )}
+      </section>
+
+      <section className="mt-14">
+        <div className="flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight">Visitors</h2>
+            <p className="mt-1 text-sm text-ink-2">
+              Everyone who&apos;s opened the site, newest first. Repeat visits
+              from the same IP add to the count rather than a new row.
+            </p>
+          </div>
+          {visitors && (
+            <div className="flex gap-2 text-xs">
+              <span className="px-2.5 py-1 rounded-full border border-[var(--border)] bg-[var(--surface)]">
+                {visitors.unique_ips.toLocaleString()} unique
+              </span>
+              <span className="px-2.5 py-1 rounded-full border border-[var(--border)] bg-[var(--surface)]">
+                {visitors.total_hits.toLocaleString()} total views
+              </span>
+            </div>
+          )}
+        </div>
+
+        {!visitors ? (
+          <p className="mt-4 text-sm text-ink-2">Loading…</p>
+        ) : visitors.visitors.length === 0 ? (
+          <p className="mt-4 text-sm text-ink-2">No visits recorded yet.</p>
+        ) : (
+          <>
+            <div className="mt-5 scroll-x rounded-xl border border-[var(--border)]">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="bg-[var(--surface-2)]">
+                    <Th>Location</Th>
+                    <Th>IP</Th>
+                    <Th className="text-right">Visits</Th>
+                    <Th>Last page</Th>
+                    <Th>Last seen</Th>
+                    <Th>First seen</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visitors.visitors.map((v) => (
+                    <tr key={v.ip} className="border-b border-[var(--border)] last:border-0">
+                      <td className="px-4 py-3 align-top">
+                        <p className="font-medium whitespace-nowrap inline-flex items-center gap-1.5">
+                          <MapPin size={12} className="text-[var(--text-muted)] shrink-0" />
+                          {[v.city, v.country].filter(Boolean).join(", ") || "Unknown"}
+                        </p>
+                        {(v.region || v.org) && (
+                          <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                            {[v.region, v.org].filter(Boolean).join(" · ")}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 align-top whitespace-nowrap tabular text-ink-2">
+                        {v.ip}
+                      </td>
+                      <td className="px-4 py-3 align-top text-right tabular font-medium">
+                        {v.visit_count}
+                      </td>
+                      <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
+                        {v.path ?? "—"}
+                      </td>
+                      <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
+                        {formatWhen(v.last_seen)}
+                      </td>
+                      <td className="px-4 py-3 align-top whitespace-nowrap text-xs text-[var(--text-muted)]">
+                        {new Date(v.first_seen).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {visitors.pages > 1 && (
+              <div className="mt-4 flex items-center justify-between gap-4">
+                <p className="text-xs text-ink-2">
+                  Page {visitors.page} of {visitors.pages}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setVpage((p) => Math.max(1, p - 1))}
+                    disabled={visitors.page <= 1}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-sm hover:border-[var(--border-strong)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft size={14} />
+                    Prev
+                  </button>
+                  <button
+                    onClick={() => setVpage((p) => Math.min(visitors.pages, p + 1))}
+                    disabled={visitors.page >= visitors.pages}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-sm hover:border-[var(--border-strong)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Next
+                    <ChevronRight size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </section>
     </main>

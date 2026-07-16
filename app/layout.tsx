@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import VisitTracker from "@/components/VisitTracker";
 import { AUTHOR, SITE_URL } from "@/lib/site";
 
 const description =
@@ -89,6 +90,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to content
         </a>
+        <VisitTracker />
         <Nav />
         <div id="main">{children}</div>
         <Footer />
