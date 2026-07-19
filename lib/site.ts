@@ -247,6 +247,28 @@ export const TOOLS: Tool[] = [
     destructive: true,
   },
   {
+    name: "get_my_stats",
+    purpose:
+      "Your numbers at a glance — lifetime and last-24h sends, companies reached, failures, remaining quota, plan, and the last few sends. The assistant calls this when you ask \"how many emails have I sent?\" or \"show my stats\".",
+    input: [],
+    output:
+      "email, name, plan, total_sent, total_failed, companies_reached, sent_last_24h, daily_limit, remaining_today, free_remaining, subscription_ends_at, recent[5]",
+    example: `{
+  "plan": "free",
+  "total_sent": 12,
+  "total_failed": 1,
+  "companies_reached": 9,
+  "sent_last_24h": 3,
+  "daily_limit": 80,
+  "remaining_today": 77,
+  "free_remaining": 0,
+  "recent": [
+    { "to_email": "careers@acme.com", "company": "Acme",
+      "success": true, "sent_at": "2026-07-19T09:22:04+00:00" }
+  ]
+}`,
+  },
+  {
     name: "get_sent_history",
     purpose:
       "Everything you've sent through Setu, newest first. The record survives across sessions, which is what makes duplicate-send prevention possible.",

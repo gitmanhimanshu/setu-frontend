@@ -87,7 +87,7 @@ const terminalLines = [
   { text: "\u2713 Opening Google sign-in\u2026", dim: true },
   { text: "\u2713 Granted: Send email on your behalf", dim: true },
   { text: "" },
-  { text: "6 tools available. Ask Claude to apply somewhere." },
+  { text: "8 tools available. Ask Claude to apply somewhere." },
 ];
 
 export default function Home() {
