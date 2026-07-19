@@ -5,6 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ArrowRight,
   BadgeCheck,
+  Eye,
+  EyeOff,
   ExternalLink,
   FileText,
   LogOut,
@@ -555,9 +557,47 @@ function LinksCard({
 }
 
 function RecentSends({ stats }: { stats: Stats }) {
+  const totalOpens = stats.recent.reduce((sum, s) => sum + (s.open_count || 0), 0);
+  const openedCount = stats.recent.filter((s) => s.open_count > 0).length;
+
   return (
     <section className="mt-10">
-      <h2 className="text-lg sm:text-xl font-semibold tracking-tight">Recent sends</h2>
+      {/* Tracking highlight banner */}
+      <div className="relative overflow-hidden rounded-2xl border border-[var(--accent)]/20 bg-gradient-to-br from-[var(--accent-glow)] via-[var(--surface)] to-[var(--surface)] p-5 sm:p-6">
+        <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-[var(--accent)]/5 blur-2xl pointer-events-none" aria-hidden="true" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex items-center gap-3">
+            <span className="grid place-items-center w-10 h-10 rounded-xl bg-[var(--accent)]/10 text-[var(--accent)]">
+              <Eye size={20} strokeWidth={2} />
+            </span>
+            <div>
+              <h2 className="text-base sm:text-lg font-semibold tracking-tight">Email Open Tracking</h2>
+              <p className="text-sm text-[var(--text-secondary)]">
+                See when recruiters open your resume link — in real time.
+              </p>
+            </div>
+          </div>
+          <div className="sm:ml-auto flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] font-medium tabular">
+                <Eye size={13} />
+                {totalOpens} opens
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--good)]/10 text-[var(--good-text)] font-medium tabular">
+                <EyeOff size={13} />
+                {stats.recent.length - openedCount} unseen
+              </span>
+            </div>
+          </div>
+        </div>
+        <p className="relative mt-3 text-xs text-[var(--text-muted)] leading-relaxed max-w-2xl">
+          Every resume link is wrapped with a tracker. When HR opens it, Setu records the click and redirects them to your actual resume. You see who opened, how many times, and when.
+        </p>
+      </div>
+
+      <h3 className="mt-6 text-lg sm:text-xl font-semibold tracking-tight">Recent sends</h3>
 
       <ul className="mt-4 sm:hidden space-y-3">
         {stats.recent.map((send, i) => (
@@ -573,10 +613,15 @@ function RecentSends({ stats }: { stats: Stats }) {
               {send.company && <>{send.company} · </>}
               {formatWhen(send.sent_at)}
             </p>
-            <p className="mt-1 text-xs text-ink-3">
-              {formatOpenCount(send.open_count)}
-              {send.link_name ? ` · ${send.link_name}` : ""}
-            </p>
+            <div className="mt-2 flex items-center gap-2">
+              <OpenBadge openCount={send.open_count} lastOpenedAt={send.last_opened_at} />
+              {send.link_name && (
+                <span className="inline-flex items-center gap-1 text-xs text-ink-3">
+                  <FileText size={11} />
+                  {send.link_name}
+                </span>
+              )}
+            </div>
           </li>
         ))}
       </ul>
@@ -596,7 +641,7 @@ function RecentSends({ stats }: { stats: Stats }) {
           </thead>
           <tbody>
             {stats.recent.map((send, i) => (
-              <tr key={i} className="border-b border-line last:border-0">
+              <tr key={i} className="border-b border-line last:border-0 hover:bg-[var(--surface-2)]/50 transition-colors">
                 <td className="px-4 py-3 align-top whitespace-nowrap font-medium">
                   {send.to_email}
                 </td>
@@ -609,14 +654,8 @@ function RecentSends({ stats }: { stats: Stats }) {
                 <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
                   {send.link_name ?? "-"}
                 </td>
-                <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
-                  {send.open_count > 0 ? (
-                    <span title={send.last_opened_at ? `Last opened ${formatWhen(send.last_opened_at)}` : undefined}>
-                      {send.open_count}
-                    </span>
-                  ) : (
-                    "-"
-                  )}
+                <td className="px-4 py-3 align-top whitespace-nowrap">
+                  <OpenBadge openCount={send.open_count} lastOpenedAt={send.last_opened_at} />
                 </td>
                 <td className="px-4 py-3 align-top">
                   <StatusPill ok={send.success} />
@@ -702,6 +741,35 @@ function EmptyState() {
         <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
       </Link>
     </div>
+  );
+}
+
+function OpenBadge({
+  openCount,
+  lastOpenedAt,
+}: {
+  openCount: number;
+  lastOpenedAt: string | null;
+}) {
+  if (openCount <= 0) {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--surface-2)] text-[var(--text-muted)]">
+        <EyeOff size={11} />
+        Not opened
+      </span>
+    );
+  }
+
+  const title = lastOpenedAt ? `Last opened ${formatWhen(lastOpenedAt)}` : undefined;
+
+  return (
+    <span
+      title={title}
+      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--good)]/10 text-[var(--good-text)]"
+    >
+      <Eye size={11} />
+      {openCount} {openCount === 1 ? "open" : "opens"}
+    </span>
   );
 }
 

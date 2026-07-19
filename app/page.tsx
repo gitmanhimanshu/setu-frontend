@@ -1,8 +1,10 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  BarChart3,
   CheckCircle2,
   Clock,
+  Eye,
   FileText,
   Gauge,
   KeyRound,
@@ -170,6 +172,114 @@ export default function Home() {
             <AnimatedTerminal lines={terminalLines} />
           </Reveal>
         </div>
+      </section>
+
+      {/* Email Open Tracking — highlighted feature right after hero */}
+      <section className="mx-auto max-w-6xl px-6 py-16 border-t border-[var(--border)]">
+        <Reveal>
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--accent)]/20 bg-gradient-to-br from-[var(--accent-glow)] via-[var(--surface)] to-[var(--surface)]">
+            <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-[var(--accent)]/5 blur-3xl pointer-events-none" aria-hidden="true" />
+            <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-[var(--accent)]/5 blur-3xl pointer-events-none" aria-hidden="true" />
+
+            <div className="relative grid lg:grid-cols-2 gap-8 p-8 sm:p-12">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold mb-5">
+                  <Eye size={13} />
+                  OPEN TRACKING
+                </div>
+
+                <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight leading-[1.1]">
+                  Know who opened
+                  <br />
+                  <span className="text-[var(--accent)]">your resume.</span>
+                </h2>
+
+                <p className="mt-5 text-[var(--text-secondary)] leading-relaxed max-w-lg">
+                  Every resume link is wrapped with a tracker. When HR opens it, Setu
+                  records the click, counts how many times, and tells you exactly when
+                  they looked — then redirects them to your actual resume.
+                </p>
+
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <Link
+                    href="/docs"
+                    className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--text-primary)] text-[var(--plane)] font-medium hover:opacity-90 transition-opacity"
+                  >
+                    Start tracking
+                    <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                  <a
+                    href="/dashboard"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] font-medium hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] transition-all"
+                  >
+                    View dashboard
+                  </a>
+                </div>
+              </div>
+
+              {/* Live tracking preview */}
+              <div className="flex items-center justify-center">
+                <Reveal delay={0.15}>
+                  <div className="w-full max-w-sm">
+                    <div className="rounded-xl border border-[var(--border)] bg-[var(--plane)] shadow-[var(--shadow-lg)] overflow-hidden">
+                      {/* Header */}
+                      <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--surface)]">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--critical)]" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--warning)]" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--good)]" />
+                          <span className="ml-2 text-xs text-[var(--text-muted)] font-medium">Recent Sends</span>
+                        </div>
+                      </div>
+
+                      {/* Fake send rows */}
+                      <div className="divide-y divide-[var(--border)]">
+                        <TrackingRow
+                          email="hr@acme.com"
+                          company="Acme Corp"
+                          opens={3}
+                          time="2m ago"
+                          status="opened"
+                        />
+                        <TrackingRow
+                          email="careers@startup.io"
+                          company="Startup Inc"
+                          opens={1}
+                          time="1h ago"
+                          status="opened"
+                        />
+                        <TrackingRow
+                          email="jobs@bigco.com"
+                          company="BigCo"
+                          opens={0}
+                          time="3h ago"
+                          status="pending"
+                        />
+                      </div>
+
+                      {/* Footer stats */}
+                      <div className="px-4 py-3 bg-[var(--surface)] border-t border-[var(--border)]">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-[var(--text-muted)]">This week</span>
+                          <div className="flex items-center gap-3">
+                            <span className="flex items-center gap-1 text-[var(--good-text)]">
+                              <Eye size={11} />
+                              <span className="font-semibold">12 opens</span>
+                            </span>
+                            <span className="flex items-center gap-1 text-[var(--accent)]">
+                              <BarChart3 size={11} />
+                              <span className="font-semibold">4 companies</span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Reveal>
+              </div>
+            </div>
+          </div>
+        </Reveal>
       </section>
 
       {/* How it works — right after the hero: showing the thing working beats
@@ -439,6 +549,45 @@ function Item({ children, ok = false }: { children: React.ReactNode; ok?: boolea
         {children}
       </span>
     </li>
+  );
+}
+
+function TrackingRow({
+  email,
+  company,
+  opens,
+  time,
+  status,
+}: {
+  email: string;
+  company: string;
+  opens: number;
+  time: string;
+  status: "opened" | "pending";
+}) {
+  return (
+    <div className="px-4 py-3 flex items-center gap-3">
+      <span
+        className="shrink-0 grid place-items-center w-7 h-7 rounded-full text-white text-[10px] font-bold"
+        style={{ background: status === "opened" ? "var(--good)" : "var(--text-muted)" }}
+      >
+        {status === "opened" ? <Eye size={12} /> : <Eye size={12} />}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium truncate">{email}</p>
+        <p className="text-[11px] text-[var(--text-muted)]">{company}</p>
+      </div>
+      <div className="text-right shrink-0">
+        {opens > 0 ? (
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--good-text)]">
+            {opens} open{opens > 1 ? "s" : ""}
+          </span>
+        ) : (
+          <span className="text-xs text-[var(--text-muted)]">waiting</span>
+        )}
+        <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{time}</p>
+      </div>
+    </div>
   );
 }
 
