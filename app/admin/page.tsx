@@ -288,24 +288,24 @@ function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
           <div className="mt-10">
             <HeroFigure
               label="Emails sent, all time"
-              value={overview.sent.toLocaleString()}
-              note={`${overview.sent_24h.toLocaleString()} in the last 24 hours`}
+              value={(overview.sent ?? 0).toLocaleString()}
+              note={`${(overview.sent_24h ?? 0).toLocaleString()} in the last 24 hours`}
             />
           </div>
           <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <StatTile label="Users" value={overview.users.toLocaleString()} />
+            <StatTile label="Users" value={(overview.users ?? 0).toLocaleString()} />
             <StatTile
               label="Subscribed"
-              value={overview.subscribed.toLocaleString()}
+              value={(overview.subscribed ?? 0).toLocaleString()}
               note="on a paid plan"
             />
             <StatTile
               label="Sent, last 24h"
-              value={overview.sent_24h.toLocaleString()}
+              value={(overview.sent_24h ?? 0).toLocaleString()}
             />
             <StatTile
               label="Failed sends"
-              value={overview.failed.toLocaleString()}
+              value={(overview.failed ?? 0).toLocaleString()}
               note="all time"
             />
           </div>
@@ -412,10 +412,10 @@ function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
           {visitors && (
             <div className="flex gap-2 text-xs">
               <span className="px-2.5 py-1 rounded-full border border-[var(--border)] bg-[var(--surface)]">
-                {visitors.unique_ips.toLocaleString()} unique
+                {(visitors.unique_ips ?? 0).toLocaleString()} unique
               </span>
               <span className="px-2.5 py-1 rounded-full border border-[var(--border)] bg-[var(--surface)]">
-                {visitors.total_hits.toLocaleString()} total views
+                {(visitors.total_hits ?? 0).toLocaleString()} total views
               </span>
             </div>
           )}
