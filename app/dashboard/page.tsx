@@ -221,21 +221,21 @@ function Panel({
             <>
               <HeroFigure
                 label="Applications sent"
-                value={stats.total_sent.toLocaleString()}
-                note={`${stats.companies.toLocaleString()} ${stats.companies === 1 ? "company" : "companies"} reached`}
+                value={(stats.total_sent ?? 0).toLocaleString()}
+                note={`${(stats.companies ?? 0).toLocaleString()} ${(stats.companies ?? 0) === 1 ? "company" : "companies"} reached`}
               />
 
               <div className="mt-8 grid sm:grid-cols-2 gap-4">
                 <Meter
                   label="Today's quota"
-                  used={stats.sent_last_24h}
-                  total={stats.daily_limit}
+                  used={stats.sent_last_24h ?? 0}
+                  total={stats.daily_limit ?? 80}
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <StatTile
                     label="Resume opens"
-                    value={stats.total_opens.toLocaleString()}
-                    note={`${stats.opened_sends.toLocaleString()} ${stats.opened_sends === 1 ? "send" : "sends"} opened`}
+                    value={(stats.total_opens ?? 0).toLocaleString()}
+                    note={`${(stats.opened_sends ?? 0).toLocaleString()} ${(stats.opened_sends ?? 0) === 1 ? "send" : "sends"} opened`}
                   />
                   <StatTile
                     label={stats.plan === "pro" ? "Plan" : "Free left"}
@@ -342,7 +342,7 @@ function LinksCard({
   function startEditing(link?: SavedLink) {
     setName(link?.name ?? "");
     setValue(link?.url ?? "");
-    setMakeDefault(link?.is_default ?? stats.links.length === 0);
+    setMakeDefault(link?.is_default ?? (stats.links ?? []).length === 0);
     setError(null);
     setSavedNote(null);
     setEditing(true);
@@ -486,7 +486,7 @@ function LinksCard({
       )}
 
       <ul className="mt-4 space-y-3">
-        {stats.links.map((link) => (
+        {(stats.links ?? []).map((link) => (
           <li key={link.name} className="rounded-xl border border-line bg-[var(--plane)] p-3">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -546,7 +546,7 @@ function LinksCard({
         ))}
       </ul>
 
-      {!editing && stats.links.length === 0 && (
+      {!editing && (stats.links ?? []).length === 0 && (
         <p className="mt-3 text-sm text-ink-2 leading-relaxed">
           No {label.toLowerCase()} saved yet. Add one here, or ask your assistant:
           <em className="text-ink"> "Save my {label.toLowerCase()} link"</em>
@@ -557,8 +557,9 @@ function LinksCard({
 }
 
 function RecentSends({ stats }: { stats: Stats }) {
-  const totalOpens = stats.recent.reduce((sum, s) => sum + (s.open_count || 0), 0);
-  const openedCount = stats.recent.filter((s) => s.open_count > 0).length;
+  const recent = stats.recent ?? [];
+  const totalOpens = recent.reduce((sum, s) => sum + (s.open_count || 0), 0);
+  const openedCount = recent.filter((s) => s.open_count > 0).length;
 
   return (
     <section className="mt-10">
@@ -587,7 +588,7 @@ function RecentSends({ stats }: { stats: Stats }) {
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--good)]/10 text-[var(--good-text)] font-medium tabular">
                 <EyeOff size={13} />
-                {stats.recent.length - openedCount} unseen
+                {recent.length - openedCount} unseen
               </span>
             </div>
           </div>
@@ -600,7 +601,7 @@ function RecentSends({ stats }: { stats: Stats }) {
       <h3 className="mt-6 text-lg sm:text-xl font-semibold tracking-tight">Recent sends</h3>
 
       <ul className="mt-4 sm:hidden space-y-3">
-        {stats.recent.map((send, i) => (
+        {recent.map((send, i) => (
           <li key={i} className="rounded-xl border border-line bg-surface p-4">
             <div className="flex items-start justify-between gap-3">
               <p className="font-medium text-sm break-all">{send.to_email}</p>
@@ -640,7 +641,7 @@ function RecentSends({ stats }: { stats: Stats }) {
             </tr>
           </thead>
           <tbody>
-            {stats.recent.map((send, i) => (
+            {recent.map((send, i) => (
               <tr key={i} className="border-b border-line last:border-0 hover:bg-[var(--surface-2)]/50 transition-colors">
                 <td className="px-4 py-3 align-top whitespace-nowrap font-medium">
                   {send.to_email}
@@ -673,7 +674,7 @@ function RecentSends({ stats }: { stats: Stats }) {
 }
 
 function CompanyOpens({ stats }: { stats: Stats }) {
-  const rows = stats.company_opens;
+  const rows = stats.company_opens ?? [];
 
   if (rows.length === 0) return null;
 
