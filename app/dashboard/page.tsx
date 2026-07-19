@@ -2,7 +2,16 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowRight, LogOut, RefreshCw } from "lucide-react";
+import {
+  ArrowRight,
+  BadgeCheck,
+  ExternalLink,
+  FileText,
+  LogOut,
+  Mail,
+  RefreshCw,
+  Sparkles,
+} from "lucide-react";
 import Logo from "@/components/Logo";
 import { HeroFigure, Meter, StatTile, StatusPill } from "@/components/StatTile";
 import { CopyButton } from "@/components/CodeWindow";
@@ -50,6 +59,8 @@ export default function Dashboard() {
   );
 }
 
+/* ---------- Signed-out ---------- */
+
 function Connect({
   notice,
   onSignedIn,
@@ -73,42 +84,45 @@ function Connect({
   }
 
   return (
-    <main className="min-h-[80vh] grid place-items-center px-6 py-20">
-      <div className="w-full max-w-sm text-center">
-        <div className="flex flex-col items-center gap-3 mb-8">
-          <Logo size={44} />
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Your dashboard</h1>
-            <p className="mt-2 text-sm text-ink-2 leading-relaxed">
-              Everything Setu has sent for you — applications, delivery, and
-              quota. Sign in with the same Google account you connected in your
-              assistant.
-            </p>
+    <main className="min-h-[80vh] grid place-items-center px-6 py-16">
+      <div className="w-full max-w-md">
+        <div className="rounded-2xl border border-line bg-surface p-8 sm:p-10 text-center shadow-[var(--shadow-sm)]">
+          <div
+            className="mx-auto w-fit rounded-2xl p-4 grid place-items-center"
+            style={{ background: "var(--accent-glow)" }}
+          >
+            <Logo size={40} />
           </div>
+          <h1 className="mt-5 text-2xl font-semibold tracking-tight">Your dashboard</h1>
+          <p className="mt-2 text-sm text-ink-2 leading-relaxed">
+            Applications, delivery, quota, and your saved resume — all in one
+            place. Sign in with the same Google account you connected in your
+            assistant.
+          </p>
+
+          {notice && (
+            <p className="mt-5 rounded-lg border border-line bg-[var(--surface-2)] px-4 py-3 text-sm text-ink-2">
+              {notice}
+            </p>
+          )}
+
+          <button
+            onClick={signIn}
+            disabled={busy}
+            className="mt-6 w-full inline-flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-line bg-[var(--plane)] font-medium text-sm hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] transition-all disabled:opacity-50"
+          >
+            <GoogleMark />
+            {busy ? "Waiting for Google…" : "Sign in with Google"}
+          </button>
+
+          {error && (
+            <p role="alert" className="mt-4 text-sm" style={{ color: "var(--critical)" }}>
+              ✕ {error}
+            </p>
+          )}
         </div>
 
-        {notice && (
-          <p className="mb-4 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm text-ink-2">
-            {notice}
-          </p>
-        )}
-
-        <button
-          onClick={signIn}
-          disabled={busy}
-          className="w-full inline-flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] font-medium text-sm hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] transition-all disabled:opacity-50"
-        >
-          <GoogleMark />
-          {busy ? "Waiting for Google…" : "Sign in with Google"}
-        </button>
-
-        {error && (
-          <p role="alert" className="mt-4 text-sm" style={{ color: "var(--critical)" }}>
-            ✕ {error}
-          </p>
-        )}
-
-        <p className="mt-6 text-xs text-[var(--text-muted)] leading-relaxed">
+        <p className="mt-5 text-center text-xs text-ink-3 leading-relaxed px-4">
           Read-only: the dashboard never asks for the send permission, so it
           cannot send anything — it only shows what you already sent.
         </p>
@@ -116,6 +130,8 @@ function Connect({
     </main>
   );
 }
+
+/* ---------- Signed-in ---------- */
 
 function Panel({
   token,
@@ -151,7 +167,7 @@ function Panel({
           </p>
           <button
             onClick={load}
-            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-sm font-medium hover:border-[var(--border-strong)] transition-colors"
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-line bg-surface text-sm font-medium hover:border-[var(--border-strong)] transition-colors"
           >
             <RefreshCw size={14} />
             Try again
@@ -170,145 +186,265 @@ function Panel({
   }
 
   return (
-    <main className="max-w-5xl mx-auto px-6 py-14">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
-          <p className="mt-1 text-sm text-ink-2">
-            {stats.name ?? stats.email}
-            {stats.role_label && <> · {stats.role_label}</>}
-            {" · "}
-            {stats.plan === "pro" ? "Pro plan" : "Free plan"}
-          </p>
-        </div>
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Dashboard</h1>
         <div className="flex gap-2">
           <button
             onClick={load}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-sm font-medium hover:border-[var(--border-strong)] transition-colors"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-line bg-surface text-sm font-medium hover:border-[var(--border-strong)] transition-colors"
           >
             <RefreshCw size={14} />
-            Refresh
+            <span className="hidden sm:inline">Refresh</span>
           </button>
           <button
             onClick={() => onSignOut()}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-sm font-medium hover:border-[var(--border-strong)] transition-colors"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-line bg-surface text-sm font-medium hover:border-[var(--border-strong)] transition-colors"
           >
             <LogOut size={14} />
-            Sign out
+            <span className="hidden sm:inline">Sign out</span>
           </button>
         </div>
       </div>
 
-      {stats.total_sent === 0 ? (
-        <EmptyState />
-      ) : (
-        <>
-          <div className="mt-10">
-            <HeroFigure
-              label="Applications sent"
-              value={stats.total_sent.toLocaleString()}
-              note={`${stats.companies.toLocaleString()} ${stats.companies === 1 ? "company" : "companies"} reached`}
-            />
-          </div>
+      <div className="mt-8 grid lg:grid-cols-[1fr_340px] gap-8 lg:gap-10 items-start">
+        {/* Left: the numbers */}
+        <div className="min-w-0">
+          {stats.total_sent === 0 ? (
+            <EmptyState />
+          ) : (
+            <>
+              <HeroFigure
+                label="Applications sent"
+                value={stats.total_sent.toLocaleString()}
+                note={`${stats.companies.toLocaleString()} ${stats.companies === 1 ? "company" : "companies"} reached`}
+              />
 
-          <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Meter
-              label="Today's quota"
-              used={stats.sent_last_24h}
-              total={stats.daily_limit}
-            />
-            <StatTile
-              label={stats.plan === "pro" ? "Plan" : "Free emails left"}
-              value={
-                stats.plan === "pro"
-                  ? "Pro"
-                  : `${stats.free_remaining ?? 0} / ${stats.free_email_limit}`
-              }
-              note={
-                stats.plan === "pro" && stats.subscription_ends_at
-                  ? `renews ${new Date(stats.subscription_ends_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
-                  : stats.plan === "pro"
-                    ? undefined
-                    : "lifetime allowance"
-              }
-            />
-            <StatTile
-              label="Failed sends"
-              value={stats.total_failed.toLocaleString()}
-              note="all time"
-            />
-          </div>
+              <div className="mt-8 grid sm:grid-cols-2 gap-4">
+                <Meter
+                  label="Today's quota"
+                  used={stats.sent_last_24h}
+                  total={stats.daily_limit}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <StatTile
+                    label={stats.plan === "pro" ? "Plan" : "Free left"}
+                    value={
+                      stats.plan === "pro"
+                        ? "Pro"
+                        : `${stats.free_remaining ?? 0}`
+                    }
+                    note={
+                      stats.plan === "pro" && stats.subscription_ends_at
+                        ? `renews ${new Date(stats.subscription_ends_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
+                        : stats.plan === "pro"
+                          ? undefined
+                          : `of ${stats.free_email_limit} lifetime`
+                    }
+                  />
+                  <StatTile
+                    label="Failed"
+                    value={stats.total_failed.toLocaleString()}
+                    note="all time"
+                  />
+                </div>
+              </div>
 
-          {stats.link && (
-            <p className="mt-6 text-sm text-ink-2">
-              {stats.link_label ?? "Link"} on file:{" "}
-              <a
-                href={stats.link}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="text-[var(--accent)] hover:underline break-all"
-              >
-                {stats.link}
-              </a>
-            </p>
+              <RecentSends stats={stats} />
+            </>
           )}
+        </div>
 
-          <section className="mt-12">
-            <h2 className="text-xl font-semibold tracking-tight">Recent sends</h2>
-            <div className="mt-5 scroll-x rounded-xl border border-[var(--border)]">
-              <table className="w-full text-sm border-collapse">
-                <thead>
-                  <tr className="bg-[var(--surface-2)]">
-                    <Th>To</Th>
-                    <Th>Company</Th>
-                    <Th>Subject</Th>
-                    <Th>Status</Th>
-                    <Th>When</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.recent.map((send, i) => (
-                    <tr key={i} className="border-b border-[var(--border)] last:border-0">
-                      <td className="px-4 py-3 align-top whitespace-nowrap font-medium">
-                        {send.to_email}
-                      </td>
-                      <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
-                        {send.company ?? "—"}
-                      </td>
-                      <td className="px-4 py-3 align-top text-ink-2 max-w-xs truncate">
-                        {send.subject ?? "—"}
-                      </td>
-                      <td className="px-4 py-3 align-top">
-                        <StatusPill ok={send.success} />
-                      </td>
-                      <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
-                        {formatWhen(send.sent_at)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </>
-      )}
+        {/* Right: who you are + what rides along */}
+        <aside className="space-y-4 lg:sticky lg:top-24 min-w-0">
+          <AccountCard stats={stats} />
+          <LinkCard stats={stats} />
+        </aside>
+      </div>
     </main>
+  );
+}
+
+function AccountCard({ stats }: { stats: Stats }) {
+  const initial = (stats.name ?? stats.email ?? "?").trim().charAt(0).toUpperCase();
+  return (
+    <section className="rounded-xl border border-line bg-surface p-5">
+      <div className="flex items-center gap-3">
+        <div
+          className="shrink-0 grid place-items-center w-11 h-11 rounded-full text-lg font-semibold text-white"
+          style={{ background: "var(--accent)" }}
+          aria-hidden="true"
+        >
+          {initial}
+        </div>
+        <div className="min-w-0">
+          <p className="font-semibold truncate">{stats.name ?? stats.email}</p>
+          <p className="text-xs text-ink-3 truncate flex items-center gap-1.5">
+            <Mail size={11} className="shrink-0" />
+            {stats.email}
+          </p>
+        </div>
+      </div>
+
+      <dl className="mt-4 space-y-2.5 text-sm">
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-ink-2">Role</dt>
+          <dd className="font-medium">{stats.role_label ?? "Not set yet"}</dd>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-ink-2">Plan</dt>
+          <dd className="inline-flex items-center gap-1.5 font-medium">
+            {stats.plan === "pro" ? (
+              <>
+                <Sparkles size={13} style={{ color: "var(--accent)" }} aria-hidden="true" />
+                Pro
+              </>
+            ) : (
+              <>
+                <BadgeCheck size={13} className="text-ink-3" aria-hidden="true" />
+                Free
+              </>
+            )}
+          </dd>
+        </div>
+        {stats.plan === "pro" && stats.subscription_ends_at && (
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-ink-2">Renews</dt>
+            <dd className="font-medium">
+              {new Date(stats.subscription_ends_at).toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </dd>
+          </div>
+        )}
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-ink-2">Daily limit</dt>
+          <dd className="font-medium tabular">{stats.daily_limit} / day</dd>
+        </div>
+      </dl>
+    </section>
+  );
+}
+
+function LinkCard({ stats }: { stats: Stats }) {
+  const label = stats.link_label ?? "Resume";
+  return (
+    <section className="rounded-xl border border-line bg-surface p-5">
+      <div className="flex items-center gap-2">
+        <FileText size={15} className="text-ink-2" aria-hidden="true" />
+        <h2 className="font-semibold text-sm">{label}</h2>
+      </div>
+
+      {stats.link ? (
+        <>
+          <p className="mt-2 text-xs text-ink-3 leading-relaxed">
+            Attached to every email you send through Setu.
+          </p>
+          <div className="mt-3 rounded-lg border border-line bg-[var(--plane)] px-3 py-2.5">
+            <code className="block text-xs leading-relaxed break-all">{stats.link}</code>
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <a
+              href={stats.link}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-[var(--plane)] text-xs font-medium hover:border-[var(--border-strong)] transition-colors"
+            >
+              <ExternalLink size={12} />
+              Open
+            </a>
+            <CopyButton value={stats.link} />
+          </div>
+        </>
+      ) : (
+        <p className="mt-2 text-sm text-ink-2 leading-relaxed">
+          No {label.toLowerCase()} saved yet. Ask your assistant:{" "}
+          <em className="text-ink">&ldquo;Save my {label.toLowerCase()} link&rdquo;</em>
+        </p>
+      )}
+    </section>
+  );
+}
+
+function RecentSends({ stats }: { stats: Stats }) {
+  return (
+    <section className="mt-10">
+      <h2 className="text-lg sm:text-xl font-semibold tracking-tight">Recent sends</h2>
+
+      {/* Mobile: cards — a five-column table has nowhere to go on a phone. */}
+      <ul className="mt-4 sm:hidden space-y-3">
+        {stats.recent.map((send, i) => (
+          <li key={i} className="rounded-xl border border-line bg-surface p-4">
+            <div className="flex items-start justify-between gap-3">
+              <p className="font-medium text-sm break-all">{send.to_email}</p>
+              <StatusPill ok={send.success} />
+            </div>
+            {send.subject && (
+              <p className="mt-1.5 text-sm text-ink-2 leading-snug">{send.subject}</p>
+            )}
+            <p className="mt-2 text-xs text-ink-3">
+              {send.company && <>{send.company} · </>}
+              {formatWhen(send.sent_at)}
+            </p>
+          </li>
+        ))}
+      </ul>
+
+      {/* Desktop: table */}
+      <div className="mt-4 hidden sm:block scroll-x rounded-xl border border-line">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="bg-[var(--surface-2)]">
+              <Th>To</Th>
+              <Th>Company</Th>
+              <Th>Subject</Th>
+              <Th>Status</Th>
+              <Th>When</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {stats.recent.map((send, i) => (
+              <tr key={i} className="border-b border-line last:border-0">
+                <td className="px-4 py-3 align-top whitespace-nowrap font-medium">
+                  {send.to_email}
+                </td>
+                <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
+                  {send.company ?? "—"}
+                </td>
+                <td className="px-4 py-3 align-top text-ink-2 max-w-xs truncate">
+                  {send.subject ?? "—"}
+                </td>
+                <td className="px-4 py-3 align-top">
+                  <StatusPill ok={send.success} />
+                </td>
+                <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
+                  {formatWhen(send.sent_at)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
 
 function EmptyState() {
   return (
-    <div className="mt-14 max-w-xl">
-      <h2 className="text-2xl font-semibold tracking-tight">
+    <div className="rounded-2xl border border-line bg-surface p-6 sm:p-10">
+      <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
         Nothing sent yet — let&apos;s fix that.
       </h2>
-      <p className="mt-3 text-ink-2 leading-relaxed">
+      <p className="mt-3 text-ink-2 leading-relaxed max-w-md">
         Connect Setu in your assistant and ask it to apply somewhere. Every send
         will show up here.
       </p>
-      <div className="mt-5 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4">
+      <div className="mt-5 rounded-xl border border-line bg-[var(--plane)] p-4">
         <div className="flex items-center justify-between gap-3 mb-2">
-          <span className="text-xs font-medium text-[var(--text-muted)]">Connector URL</span>
+          <span className="text-xs font-medium text-ink-3">Connector URL</span>
           <CopyButton value={MCP_URL} />
         </div>
         <code className="block text-sm scroll-x whitespace-nowrap">{MCP_URL}</code>
@@ -326,7 +462,7 @@ function EmptyState() {
 
 function Th({ children }: { children: React.ReactNode }) {
   return (
-    <th className="text-left font-semibold px-4 py-2.5 border-b border-[var(--border)] whitespace-nowrap">
+    <th className="text-left font-semibold px-4 py-2.5 border-b border-line whitespace-nowrap">
       {children}
     </th>
   );
