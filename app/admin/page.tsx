@@ -321,7 +321,7 @@ function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
           Users{users ? ` (${users.length})` : ""}
         </TabButton>
         <TabButton active={tab === "visitors"} onClick={() => setTab("visitors")}>
-          Visitors{visitors ? ` (${visitors.unique_ips})` : ""}
+          Visitors{visitors ? ` (${visitors.unique_ips ?? 0})` : ""}
         </TabButton>
       </div>
 
