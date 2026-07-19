@@ -102,7 +102,7 @@ export default function VideoModal({
             onEnded={() => setPlaying(false)}
           >
             <source
-              src="/New chat - Claude - Google Chrome 2026-07-19 13-39-07.mp4"
+              src="https://res.cloudinary.com/dbizsbr3w/video/upload/v1784450250/New_chat_-_Claude_-_Google_Chrome_2026-07-19_13-39-07_pbqmwl.mp4"
               type="video/mp4"
             />
             Your browser does not support the video tag.
