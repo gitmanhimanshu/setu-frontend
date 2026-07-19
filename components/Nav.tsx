@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, Play, X } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
+import VideoModal from "./VideoModal";
 import Logo from "./Logo";
 import { AUTHOR, GITHUB_URL } from "@/lib/site";
 import { cn } from "@/lib/cn";
@@ -21,6 +22,7 @@ export default function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [videoOpen, setVideoOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -103,6 +105,14 @@ export default function Nav() {
           <div className="flex items-center gap-2">
             <ThemeToggle />
 
+            <button
+              onClick={() => setVideoOpen(true)}
+              className="hidden sm:inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-all"
+            >
+              <Play size={12} fill="currentColor" />
+              Tutorial
+            </button>
+
             <Link
               href="/docs"
               className="hidden sm:inline-block text-sm px-3.5 py-1.5 rounded-full bg-[var(--text-primary)] text-[var(--plane)] font-medium hover:opacity-90 transition-opacity"
@@ -131,6 +141,16 @@ export default function Nav() {
                 {link.label}
               </Link>
             ))}
+            <button
+              onClick={() => {
+                setOpen(false);
+                setVideoOpen(true);
+              }}
+              className="flex items-center gap-2 px-3 py-2 rounded-md text-[var(--text-secondary)] hover:bg-[var(--surface-2)] text-left"
+            >
+              <Play size={14} fill="currentColor" />
+              Watch Tutorial
+            </button>
             <div className="mt-2 pt-3 border-t border-[var(--border)] px-3 text-[var(--text-muted)] text-xs">
               built and maintained by <span className="font-semibold text-[var(--text-primary)]">{AUTHOR.name}</span>
             </div>
@@ -153,6 +173,7 @@ export default function Nav() {
           </div>
         )}
       </div>
+      <VideoModal open={videoOpen} onClose={() => setVideoOpen(false)} />
     </header>
   );
 }
