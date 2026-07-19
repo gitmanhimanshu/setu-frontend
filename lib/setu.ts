@@ -11,7 +11,15 @@ export type Send = {
 export type Stats = {
   email: string;
   name: string | null;
-  resume_link: string | null;
+  role: string | null;
+  role_label: string | null;
+  link: string | null;
+  link_label: string | null;
+  plan: string;
+  subscribed_at: string | null;
+  subscription_ends_at: string | null;
+  free_email_limit: number;
+  free_remaining: number | null;
   total_sent: number;
   total_failed: number;
   sent_last_24h: number;

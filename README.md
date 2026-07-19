@@ -42,18 +42,19 @@ Vercel pe `NEXT_PUBLIC_SETU_URL` env var set karna. Phir server pe
 `FRONTEND_ORIGIN` apne Vercel domain pe set karna, warna dashboard ki API call
 CORS pe block hogi.
 
-## Dashboard ka auth — ye abhi adhoora hai
+## Dashboard auth — Google Identity Services
 
-Dashboard `GET /api/stats` se padhta hai aur `sessionStorage` mein
-`setu_token` (Google access token) dhundhta hai. **Web pe Google sign-in abhi
-wire nahi hua** — isliye abhi dashboard hamesha "Connect Setu" wala empty state
-dikhayega.
+Dashboard "Sign in with Google" (GIS token client, `lib/google.ts`) se ek
+access token leta hai, `sessionStorage` mein `setu_token` naam se rakhta hai
+(tab band = logout), aur `GET /api/stats` ko Bearer bhejta hai. Server token ko
+khud identity mein resolve karta hai, to har user sirf apna data dekhta hai.
+Scope sirf `openid email profile` hai — dashboard kabhi send permission nahi
+maangta.
 
-Poora karne ke liye: Google sign-in add karo (NextAuth ya Google Identity
-Services), `openid` + `email` scope maango, aur mile hue access token ko
-`sessionStorage.setItem("setu_token", token)` kar do. Server side ready hai —
-`/api/stats` token ko khud identity mein resolve karta hai, to har user sirf
-apna data dekh payega.
+Chahiye: `NEXT_PUBLIC_GOOGLE_CLIENT_ID` env var, aur Google Cloud Console mein
+us client ke **Authorized JavaScript origins** mein site ka origin
+(`https://setu.mimanasa.online`, dev ke liye `http://localhost:3000`). Origin
+missing hoga to Google ka popup "origin is not allowed" bolega.
 
 ## Design
 
