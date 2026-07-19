@@ -9,14 +9,16 @@ import {
   FileText,
   LogOut,
   Mail,
+  Pencil,
   RefreshCw,
   Sparkles,
+  X,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import { HeroFigure, Meter, StatTile, StatusPill } from "@/components/StatTile";
 import { CopyButton } from "@/components/CodeWindow";
 import { MCP_URL } from "@/lib/site";
-import { fetchStats, formatWhen, type Stats } from "@/lib/setu";
+import { fetchStats, formatWhen, saveLink, type Stats } from "@/lib/setu";
 import { requestAccessToken } from "@/lib/google";
 
 /* The user dashboard. Sign-in is Google Identity Services in a popup; the
@@ -259,7 +261,7 @@ function Panel({
         {/* Right: who you are + what rides along */}
         <aside className="space-y-4 lg:sticky lg:top-24 min-w-0">
           <AccountCard stats={stats} />
-          <LinkCard stats={stats} />
+          <LinkCard stats={stats} token={token} onSaved={load} />
         </aside>
       </div>
     </main>
@@ -329,20 +331,116 @@ function AccountCard({ stats }: { stats: Stats }) {
   );
 }
 
-function LinkCard({ stats }: { stats: Stats }) {
+function LinkCard({
+  stats,
+  token,
+  onSaved,
+}: {
+  stats: Stats;
+  token: string;
+  onSaved: () => void;
+}) {
   const label = stats.link_label ?? "Resume";
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [savedNote, setSavedNote] = useState<string | null>(null);
+
+  function startEditing() {
+    setValue(stats.link ?? "");
+    setError(null);
+    setSavedNote(null);
+    setEditing(true);
+  }
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await saveLink(token, value.trim());
+      setEditing(false);
+      setSavedNote("Saved — this link now rides on every email.");
+      onSaved();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save the link.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <section className="rounded-xl border border-line bg-surface p-5">
-      <div className="flex items-center gap-2">
-        <FileText size={15} className="text-ink-2" aria-hidden="true" />
-        <h2 className="font-semibold text-sm">{label}</h2>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <FileText size={15} className="text-ink-2" aria-hidden="true" />
+          <h2 className="font-semibold text-sm">{label}</h2>
+        </div>
+        {!editing && (
+          <button
+            onClick={startEditing}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-ink-2 hover:text-ink hover:bg-[var(--surface-2)] transition-colors"
+          >
+            <Pencil size={11} />
+            {stats.link ? "Change" : "Add"}
+          </button>
+        )}
       </div>
 
-      {stats.link ? (
+      {editing ? (
+        <form onSubmit={save} className="mt-3">
+          <label className="block">
+            <span className="sr-only">{label} link</span>
+            <input
+              type="url"
+              required
+              autoFocus
+              placeholder="https://drive.google.com/file/d/…/view"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              disabled={busy}
+              className="w-full rounded-lg border border-line bg-[var(--plane)] px-3 py-2 text-xs outline-none focus:border-[var(--accent)] disabled:opacity-50"
+            />
+          </label>
+          <p className="mt-2 text-xs text-ink-3 leading-relaxed">
+            Setu opens the link first — a file that isn&apos;t shared publicly
+            will be rejected, so make it &ldquo;Anyone with the link&rdquo;.
+          </p>
+          {error && (
+            <p role="alert" className="mt-2 text-xs leading-relaxed" style={{ color: "var(--critical)" }}>
+              ✕ {error}
+            </p>
+          )}
+          <div className="mt-3 flex items-center gap-2">
+            <button
+              type="submit"
+              disabled={busy}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--text-primary)] text-[var(--plane)] text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {busy ? "Checking link…" : "Save"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              disabled={busy}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-[var(--plane)] text-xs font-medium hover:border-[var(--border-strong)] transition-colors disabled:opacity-50"
+            >
+              <X size={11} />
+              Cancel
+            </button>
+          </div>
+        </form>
+      ) : stats.link ? (
         <>
           <p className="mt-2 text-xs text-ink-3 leading-relaxed">
             Attached to every email you send through Setu.
           </p>
+          {savedNote && (
+            <p className="mt-2 text-xs leading-relaxed" style={{ color: "var(--good-text, var(--accent))" }}>
+              ✓ {savedNote}
+            </p>
+          )}
           <div className="mt-3 rounded-lg border border-line bg-[var(--plane)] px-3 py-2.5">
             <code className="block text-xs leading-relaxed break-all">{stats.link}</code>
           </div>
@@ -361,8 +459,8 @@ function LinkCard({ stats }: { stats: Stats }) {
         </>
       ) : (
         <p className="mt-2 text-sm text-ink-2 leading-relaxed">
-          No {label.toLowerCase()} saved yet. Ask your assistant:{" "}
-          <em className="text-ink">&ldquo;Save my {label.toLowerCase()} link&rdquo;</em>
+          No {label.toLowerCase()} saved yet — add one here, or ask your
+          assistant: <em className="text-ink">&ldquo;Save my {label.toLowerCase()} link&rdquo;</em>
         </p>
       )}
     </section>

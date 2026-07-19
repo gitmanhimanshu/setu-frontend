@@ -50,6 +50,30 @@ export async function fetchStats(accessToken: string): Promise<Stats> {
   return res.json();
 }
 
+/**
+ * Save or change the resume/portfolio link. The server fetches the URL first
+ * and rejects one the recipient couldn't open (private Drive file, login
+ * wall, 404) — that rejection surfaces here as an Error with the reason.
+ */
+export async function saveLink(
+  accessToken: string,
+  link: string
+): Promise<{ link: string; detail: string }> {
+  const res = await fetch(`${SETU_URL}/api/link`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ link }),
+  });
+
+  if (res.status === 401) throw new Error("Your session expired. Sign in again.");
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error ?? `Setu server returned ${res.status}`);
+  return data;
+}
+
 export function formatWhen(iso: string): string {
   const then = new Date(iso).getTime();
   const mins = Math.round((Date.now() - then) / 60000);
