@@ -12,19 +12,26 @@ import {
   Pencil,
   RefreshCw,
   Sparkles,
+  Star,
+  Trash2,
   X,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import { HeroFigure, Meter, StatTile, StatusPill } from "@/components/StatTile";
 import { CopyButton } from "@/components/CodeWindow";
 import { MCP_URL } from "@/lib/site";
-import { fetchStats, formatWhen, saveLink, type Stats } from "@/lib/setu";
+import {
+  type CompanyOpenStat,
+  deleteLink,
+  fetchStats,
+  formatOpenCount,
+  formatWhen,
+  saveLink,
+  setDefaultLink,
+  type SavedLink,
+  type Stats,
+} from "@/lib/setu";
 import { requestAccessToken } from "@/lib/google";
-
-/* The user dashboard. Sign-in is Google Identity Services in a popup; the
-   access token lives in sessionStorage as `setu_token` (the contract /api/stats
-   was built for) and dies with the tab. The server resolves the token to an
-   identity itself, so this page can only ever see its own user's rows. */
 
 const TOKEN_KEY = "setu_token";
 
@@ -61,8 +68,6 @@ export default function Dashboard() {
   );
 }
 
-/* ---------- Signed-out ---------- */
-
 function Connect({
   notice,
   onSignedIn,
@@ -97,9 +102,8 @@ function Connect({
           </div>
           <h1 className="mt-5 text-2xl font-semibold tracking-tight">Your dashboard</h1>
           <p className="mt-2 text-sm text-ink-2 leading-relaxed">
-            Applications, delivery, quota, and your saved resume — all in one
-            place. Sign in with the same Google account you connected in your
-            assistant.
+            Applications, resume opens, quota, and your saved links in one place.
+            Sign in with the same Google account you connected in your assistant.
           </p>
 
           {notice && (
@@ -114,26 +118,24 @@ function Connect({
             className="mt-6 w-full inline-flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-line bg-[var(--plane)] font-medium text-sm hover:border-[var(--border-strong)] hover:bg-[var(--surface-2)] transition-all disabled:opacity-50"
           >
             <GoogleMark />
-            {busy ? "Waiting for Google…" : "Sign in with Google"}
+            {busy ? "Waiting for Google..." : "Sign in with Google"}
           </button>
 
           {error && (
             <p role="alert" className="mt-4 text-sm" style={{ color: "var(--critical)" }}>
-              ✕ {error}
+              x {error}
             </p>
           )}
         </div>
 
         <p className="mt-5 text-center text-xs text-ink-3 leading-relaxed px-4">
-          Read-only: the dashboard never asks for the send permission, so it
-          cannot send anything — it only shows what you already sent.
+          The dashboard can manage saved links, but it still cannot send email.
+          It never asks Google for the Gmail send permission.
         </p>
       </div>
     </main>
   );
 }
-
-/* ---------- Signed-in ---------- */
 
 function Panel({
   token,
@@ -151,7 +153,7 @@ function Panel({
       setStats(await fetchStats(token));
     } catch (err) {
       const message = err instanceof Error ? err.message : "Could not load stats.";
-      if (message.includes("expired")) return onSignOut("Your session expired — sign in again.");
+      if (message.includes("expired")) return onSignOut("Your session expired. Sign in again.");
       setError(message);
     }
   }, [token, onSignOut]);
@@ -165,7 +167,7 @@ function Panel({
       <main className="min-h-[60vh] grid place-items-center px-6">
         <div className="text-center">
           <p role="alert" className="text-sm" style={{ color: "var(--critical)" }}>
-            ✕ {error}
+            x {error}
           </p>
           <button
             onClick={load}
@@ -182,14 +184,13 @@ function Panel({
   if (!stats) {
     return (
       <main className="min-h-[60vh] grid place-items-center px-6">
-        <p className="text-sm text-ink-2">Loading your dashboard…</p>
+        <p className="text-sm text-ink-2">Loading your dashboard...</p>
       </main>
     );
   }
 
   return (
     <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-      {/* Header */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Dashboard</h1>
         <div className="flex gap-2">
@@ -211,7 +212,6 @@ function Panel({
       </div>
 
       <div className="mt-8 grid lg:grid-cols-[1fr_340px] gap-8 lg:gap-10 items-start">
-        {/* Left: the numbers */}
         <div className="min-w-0">
           {stats.total_sent === 0 ? (
             <EmptyState />
@@ -231,12 +231,13 @@ function Panel({
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <StatTile
+                    label="Resume opens"
+                    value={stats.total_opens.toLocaleString()}
+                    note={`${stats.opened_sends.toLocaleString()} ${stats.opened_sends === 1 ? "send" : "sends"} opened`}
+                  />
+                  <StatTile
                     label={stats.plan === "pro" ? "Plan" : "Free left"}
-                    value={
-                      stats.plan === "pro"
-                        ? "Pro"
-                        : `${stats.free_remaining ?? 0}`
-                    }
+                    value={stats.plan === "pro" ? "Pro" : `${stats.free_remaining ?? 0}`}
                     note={
                       stats.plan === "pro" && stats.subscription_ends_at
                         ? `renews ${new Date(stats.subscription_ends_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
@@ -245,23 +246,18 @@ function Panel({
                           : `of ${stats.free_email_limit} lifetime`
                     }
                   />
-                  <StatTile
-                    label="Failed"
-                    value={stats.total_failed.toLocaleString()}
-                    note="all time"
-                  />
                 </div>
               </div>
 
+              <CompanyOpens stats={stats} />
               <RecentSends stats={stats} />
             </>
           )}
         </div>
 
-        {/* Right: who you are + what rides along */}
         <aside className="space-y-4 lg:sticky lg:top-24 min-w-0">
           <AccountCard stats={stats} />
-          <LinkCard stats={stats} token={token} onSaved={load} />
+          <LinksCard stats={stats} token={token} onSaved={load} />
         </aside>
       </div>
     </main>
@@ -310,18 +306,10 @@ function AccountCard({ stats }: { stats: Stats }) {
             )}
           </dd>
         </div>
-        {stats.plan === "pro" && stats.subscription_ends_at && (
-          <div className="flex items-center justify-between gap-3">
-            <dt className="text-ink-2">Renews</dt>
-            <dd className="font-medium">
-              {new Date(stats.subscription_ends_at).toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </dd>
-          </div>
-        )}
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-ink-2">Default link</dt>
+          <dd className="font-medium">{stats.default_link_name ?? "None"}</dd>
+        </div>
         <div className="flex items-center justify-between gap-3">
           <dt className="text-ink-2">Daily limit</dt>
           <dd className="font-medium tabular">{stats.daily_limit} / day</dd>
@@ -331,7 +319,7 @@ function AccountCard({ stats }: { stats: Stats }) {
   );
 }
 
-function LinkCard({
+function LinksCard({
   stats,
   token,
   onSaved,
@@ -342,31 +330,63 @@ function LinkCard({
 }) {
   const label = stats.link_label ?? "Resume";
   const [editing, setEditing] = useState(false);
+  const [name, setName] = useState("");
   const [value, setValue] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [makeDefault, setMakeDefault] = useState(true);
+  const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [savedNote, setSavedNote] = useState<string | null>(null);
 
-  function startEditing() {
-    setValue(stats.link ?? "");
+  function startEditing(link?: SavedLink) {
+    setName(link?.name ?? "");
+    setValue(link?.url ?? "");
+    setMakeDefault(link?.is_default ?? stats.links.length === 0);
     setError(null);
     setSavedNote(null);
     setEditing(true);
   }
 
-  async function save(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setBusy(true);
+    setBusy("save");
     setError(null);
     try {
-      await saveLink(token, value.trim());
+      await saveLink(token, value.trim(), name.trim() || "default", makeDefault);
       setEditing(false);
-      setSavedNote("Saved — this link now rides on every email.");
+      setSavedNote("Saved. Future sends can use this link.");
       onSaved();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save the link.");
     } finally {
-      setBusy(false);
+      setBusy(null);
+    }
+  }
+
+  async function makePrimary(link: SavedLink) {
+    setBusy(`default:${link.name}`);
+    setError(null);
+    try {
+      await setDefaultLink(token, link.name);
+      setSavedNote(`${link.name} is now the default link.`);
+      onSaved();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not set the default link.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function remove(link: SavedLink) {
+    setBusy(`delete:${link.name}`);
+    setError(null);
+    try {
+      await deleteLink(token, link.name);
+      setSavedNote(`${link.name} deleted.`);
+      onSaved();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not delete the link.");
+    } finally {
+      setBusy(null);
     }
   }
 
@@ -375,55 +395,85 @@ function LinkCard({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <FileText size={15} className="text-ink-2" aria-hidden="true" />
-          <h2 className="font-semibold text-sm">{label}</h2>
+          <h2 className="font-semibold text-sm">{label} links</h2>
         </div>
         {!editing && (
           <button
-            onClick={startEditing}
+            onClick={() => startEditing()}
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-ink-2 hover:text-ink hover:bg-[var(--surface-2)] transition-colors"
           >
             <Pencil size={11} />
-            {stats.link ? "Change" : "Add"}
+            Add
           </button>
         )}
       </div>
 
-      {editing ? (
-        <form onSubmit={save} className="mt-3">
-          <label className="block">
-            <span className="sr-only">{label} link</span>
-            <input
-              type="url"
-              required
-              autoFocus
-              placeholder="https://drive.google.com/file/d/…/view"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              disabled={busy}
-              className="w-full rounded-lg border border-line bg-[var(--plane)] px-3 py-2 text-xs outline-none focus:border-[var(--accent)] disabled:opacity-50"
-            />
-          </label>
-          <p className="mt-2 text-xs text-ink-3 leading-relaxed">
-            Setu opens the link first — a file that isn&apos;t shared publicly
-            will be rejected, so make it &ldquo;Anyone with the link&rdquo;.
-          </p>
-          {error && (
-            <p role="alert" className="mt-2 text-xs leading-relaxed" style={{ color: "var(--critical)" }}>
-              ✕ {error}
-            </p>
-          )}
+      <p className="mt-2 text-xs text-ink-3 leading-relaxed">
+        Save multiple versions and choose which one rides along by default. Every
+        attached link is wrapped for open tracking.
+      </p>
+
+      {savedNote && (
+        <p className="mt-3 text-xs leading-relaxed" style={{ color: "var(--good-text, var(--accent))" }}>
+          {savedNote}
+        </p>
+      )}
+      {error && (
+        <p role="alert" className="mt-3 text-xs leading-relaxed" style={{ color: "var(--critical)" }}>
+          x {error}
+        </p>
+      )}
+
+      {editing && (
+        <form onSubmit={submit} className="mt-4 rounded-xl border border-line bg-[var(--plane)] p-3">
+          <div className="grid gap-3">
+            <label className="block">
+              <span className="text-xs text-ink-3">Name</span>
+              <input
+                type="text"
+                required
+                autoFocus
+                placeholder="default, sde, design..."
+                value={name}
+                onChange={(e) => setName(e.target.value.toLowerCase())}
+                disabled={busy !== null}
+                className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-xs outline-none focus:border-[var(--accent)] disabled:opacity-50"
+              />
+            </label>
+            <label className="block">
+              <span className="text-xs text-ink-3">URL</span>
+              <input
+                type="url"
+                required
+                placeholder="https://drive.google.com/file/d/..."
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                disabled={busy !== null}
+                className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-xs outline-none focus:border-[var(--accent)] disabled:opacity-50"
+              />
+            </label>
+            <label className="inline-flex items-center gap-2 text-xs text-ink-2">
+              <input
+                type="checkbox"
+                checked={makeDefault}
+                onChange={(e) => setMakeDefault(e.target.checked)}
+                disabled={busy !== null}
+              />
+              Make this the default attached link
+            </label>
+          </div>
           <div className="mt-3 flex items-center gap-2">
             <button
               type="submit"
-              disabled={busy}
+              disabled={busy !== null}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--text-primary)] text-[var(--plane)] text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              {busy ? "Checking link…" : "Save"}
+              {busy === "save" ? "Checking link..." : "Save"}
             </button>
             <button
               type="button"
               onClick={() => setEditing(false)}
-              disabled={busy}
+              disabled={busy !== null}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-[var(--plane)] text-xs font-medium hover:border-[var(--border-strong)] transition-colors disabled:opacity-50"
             >
               <X size={11} />
@@ -431,36 +481,73 @@ function LinkCard({
             </button>
           </div>
         </form>
-      ) : stats.link ? (
-        <>
-          <p className="mt-2 text-xs text-ink-3 leading-relaxed">
-            Attached to every email you send through Setu.
-          </p>
-          {savedNote && (
-            <p className="mt-2 text-xs leading-relaxed" style={{ color: "var(--good-text, var(--accent))" }}>
-              ✓ {savedNote}
-            </p>
-          )}
-          <div className="mt-3 rounded-lg border border-line bg-[var(--plane)] px-3 py-2.5">
-            <code className="block text-xs leading-relaxed break-all">{stats.link}</code>
-          </div>
-          <div className="mt-3 flex items-center gap-2">
-            <a
-              href={stats.link}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-[var(--plane)] text-xs font-medium hover:border-[var(--border-strong)] transition-colors"
-            >
-              <ExternalLink size={12} />
-              Open
-            </a>
-            <CopyButton value={stats.link} />
-          </div>
-        </>
-      ) : (
-        <p className="mt-2 text-sm text-ink-2 leading-relaxed">
-          No {label.toLowerCase()} saved yet — add one here, or ask your
-          assistant: <em className="text-ink">&ldquo;Save my {label.toLowerCase()} link&rdquo;</em>
+      )}
+
+      <ul className="mt-4 space-y-3">
+        {stats.links.map((link) => (
+          <li key={link.name} className="rounded-xl border border-line bg-[var(--plane)] p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="font-medium text-sm">{link.name}</p>
+                  {link.is_default && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[var(--surface-2)] px-2 py-0.5 text-[10px] font-semibold text-ink-2">
+                      <Star size={10} />
+                      default
+                    </span>
+                  )}
+                </div>
+                <code className="mt-1 block text-xs break-all text-ink-2">{link.url}</code>
+                <p className="mt-1 text-[11px] text-ink-3">
+                  Updated {formatWhen(link.updated_at)}
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-surface text-xs font-medium hover:border-[var(--border-strong)] transition-colors"
+              >
+                <ExternalLink size={12} />
+                Open
+              </a>
+              <CopyButton value={link.url} />
+              {!link.is_default && (
+                <button
+                  onClick={() => makePrimary(link)}
+                  disabled={busy !== null}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-surface text-xs font-medium hover:border-[var(--border-strong)] transition-colors disabled:opacity-50"
+                >
+                  {busy === `default:${link.name}` ? "Saving..." : "Make default"}
+                </button>
+              )}
+              <button
+                onClick={() => startEditing(link)}
+                disabled={busy !== null}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-surface text-xs font-medium hover:border-[var(--border-strong)] transition-colors disabled:opacity-50"
+              >
+                <Pencil size={11} />
+                Edit
+              </button>
+              <button
+                onClick={() => remove(link)}
+                disabled={busy !== null}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-surface text-xs font-medium hover:border-[var(--border-strong)] transition-colors disabled:opacity-50"
+              >
+                <Trash2 size={11} />
+                {busy === `delete:${link.name}` ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {!editing && stats.links.length === 0 && (
+        <p className="mt-3 text-sm text-ink-2 leading-relaxed">
+          No {label.toLowerCase()} saved yet. Add one here, or ask your assistant:
+          <em className="text-ink"> "Save my {label.toLowerCase()} link"</em>
         </p>
       )}
     </section>
@@ -472,7 +559,6 @@ function RecentSends({ stats }: { stats: Stats }) {
     <section className="mt-10">
       <h2 className="text-lg sm:text-xl font-semibold tracking-tight">Recent sends</h2>
 
-      {/* Mobile: cards — a five-column table has nowhere to go on a phone. */}
       <ul className="mt-4 sm:hidden space-y-3">
         {stats.recent.map((send, i) => (
           <li key={i} className="rounded-xl border border-line bg-surface p-4">
@@ -487,11 +573,14 @@ function RecentSends({ stats }: { stats: Stats }) {
               {send.company && <>{send.company} · </>}
               {formatWhen(send.sent_at)}
             </p>
+            <p className="mt-1 text-xs text-ink-3">
+              {formatOpenCount(send.open_count)}
+              {send.link_name ? ` · ${send.link_name}` : ""}
+            </p>
           </li>
         ))}
       </ul>
 
-      {/* Desktop: table */}
       <div className="mt-4 hidden sm:block scroll-x rounded-xl border border-line">
         <table className="w-full text-sm border-collapse">
           <thead>
@@ -499,6 +588,8 @@ function RecentSends({ stats }: { stats: Stats }) {
               <Th>To</Th>
               <Th>Company</Th>
               <Th>Subject</Th>
+              <Th>Link</Th>
+              <Th>Opens</Th>
               <Th>Status</Th>
               <Th>When</Th>
             </tr>
@@ -510,10 +601,22 @@ function RecentSends({ stats }: { stats: Stats }) {
                   {send.to_email}
                 </td>
                 <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
-                  {send.company ?? "—"}
+                  {send.company ?? "-"}
                 </td>
                 <td className="px-4 py-3 align-top text-ink-2 max-w-xs truncate">
-                  {send.subject ?? "—"}
+                  {send.subject ?? "-"}
+                </td>
+                <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
+                  {send.link_name ?? "-"}
+                </td>
+                <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
+                  {send.open_count > 0 ? (
+                    <span title={send.last_opened_at ? `Last opened ${formatWhen(send.last_opened_at)}` : undefined}>
+                      {send.open_count}
+                    </span>
+                  ) : (
+                    "-"
+                  )}
                 </td>
                 <td className="px-4 py-3 align-top">
                   <StatusPill ok={send.success} />
@@ -530,15 +633,59 @@ function RecentSends({ stats }: { stats: Stats }) {
   );
 }
 
+function CompanyOpens({ stats }: { stats: Stats }) {
+  const rows = stats.company_opens;
+
+  if (rows.length === 0) return null;
+
+  return (
+    <section className="mt-10">
+      <h2 className="text-lg sm:text-xl font-semibold tracking-tight">Company opens</h2>
+      <p className="mt-2 text-sm text-ink-2">
+        Which companies opened your attached link, and how many times.
+      </p>
+
+      <div className="mt-4 scroll-x rounded-xl border border-line">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="bg-[var(--surface-2)]">
+              <Th>Company</Th>
+              <Th>Total opens</Th>
+              <Th>Opened sends</Th>
+              <Th>Last open</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row: CompanyOpenStat) => (
+              <tr key={row.company} className="border-b border-line last:border-0">
+                <td className="px-4 py-3 align-top font-medium">{row.company}</td>
+                <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
+                  {row.total_opens}
+                </td>
+                <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
+                  {row.opened_sends}
+                </td>
+                <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
+                  {row.last_opened_at ? formatWhen(row.last_opened_at) : "-"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 function EmptyState() {
   return (
     <div className="rounded-2xl border border-line bg-surface p-6 sm:p-10">
       <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">
-        Nothing sent yet — let&apos;s fix that.
+        Nothing sent yet. Let&apos;s fix that.
       </h2>
       <p className="mt-3 text-ink-2 leading-relaxed max-w-md">
         Connect Setu in your assistant and ask it to apply somewhere. Every send
-        will show up here.
+        and every tracked open will show up here.
       </p>
       <div className="mt-5 rounded-xl border border-line bg-[var(--plane)] p-4">
         <div className="flex items-center justify-between gap-3 mb-2">
@@ -566,7 +713,6 @@ function Th({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* Official multi-colour G, inline — brand icons aren't in lucide. */
 function GoogleMark() {
   return (
     <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true">

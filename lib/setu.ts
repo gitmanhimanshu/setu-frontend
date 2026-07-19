@@ -1,4 +1,17 @@
-/** Shape of GET /api/stats on the Setu server. */
+export type SavedLink = {
+  name: string;
+  url: string;
+  updated_at: string;
+  is_default: boolean;
+};
+
+export type CompanyOpenStat = {
+  company: string;
+  total_opens: number;
+  opened_sends: number;
+  last_opened_at: string | null;
+};
+
 export type Send = {
   to_email: string;
   company: string | null;
@@ -6,6 +19,10 @@ export type Send = {
   success: boolean;
   error: string | null;
   sent_at: string;
+  open_count: number;
+  first_opened_at: string | null;
+  last_opened_at: string | null;
+  link_name: string | null;
 };
 
 export type Stats = {
@@ -14,6 +31,8 @@ export type Stats = {
   role: string | null;
   role_label: string | null;
   link: string | null;
+  default_link_name: string | null;
+  links: SavedLink[];
   link_label: string | null;
   plan: string;
   subscribed_at: string | null;
@@ -22,56 +41,88 @@ export type Stats = {
   free_remaining: number | null;
   total_sent: number;
   total_failed: number;
+  total_opens: number;
+  opened_sends: number;
   sent_last_24h: number;
   daily_limit: number;
   companies: number;
+  company_opens: CompanyOpenStat[];
   recent: Send[];
+};
+
+export type LinksResponse = {
+  success?: boolean;
+  detail?: string;
+  default_link_name: string | null;
+  link: string | null;
+  links: SavedLink[];
 };
 
 export const SETU_URL =
   process.env.NEXT_PUBLIC_SETU_URL ?? "http://localhost:8000";
 
-/**
- * Fetch the signed-in user's stats.
- *
- * The token is a Google access token — the same one the MCP flow issues. The
- * server resolves it to an identity itself; the browser never sees anyone
- * else's data because the token is the only thing that names a user.
- */
+async function parseResponse<T>(res: Response): Promise<T> {
+  if (res.status === 401) throw new Error("Your session expired. Sign in again.");
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error((data as { error?: string }).error ?? `Setu server returned ${res.status}`);
+  }
+  return data as T;
+}
+
 export async function fetchStats(accessToken: string): Promise<Stats> {
   const res = await fetch(`${SETU_URL}/api/stats`, {
     headers: { Authorization: `Bearer ${accessToken}` },
     cache: "no-store",
   });
-
-  if (res.status === 401) throw new Error("Your session expired. Sign in again.");
-  if (!res.ok) throw new Error(`Setu server returned ${res.status}`);
-
-  return res.json();
+  return parseResponse<Stats>(res);
 }
 
-/**
- * Save or change the resume/portfolio link. The server fetches the URL first
- * and rejects one the recipient couldn't open (private Drive file, login
- * wall, 404) — that rejection surfaces here as an Error with the reason.
- */
 export async function saveLink(
   accessToken: string,
-  link: string
-): Promise<{ link: string; detail: string }> {
+  link: string,
+  name: string,
+  makeDefault = false
+): Promise<LinksResponse> {
   const res = await fetch(`${SETU_URL}/api/link`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ link }),
+    body: JSON.stringify({ link, name, make_default: makeDefault }),
   });
+  return parseResponse<LinksResponse>(res);
+}
 
-  if (res.status === 401) throw new Error("Your session expired. Sign in again.");
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error ?? `Setu server returned ${res.status}`);
-  return data;
+export async function deleteLink(
+  accessToken: string,
+  name: string
+): Promise<LinksResponse> {
+  const res = await fetch(`${SETU_URL}/api/link`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name }),
+  });
+  return parseResponse<LinksResponse>(res);
+}
+
+export async function setDefaultLink(
+  accessToken: string,
+  name: string
+): Promise<LinksResponse> {
+  const res = await fetch(`${SETU_URL}/api/link/default`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name }),
+  });
+  return parseResponse<LinksResponse>(res);
 }
 
 export function formatWhen(iso: string): string {
@@ -83,4 +134,10 @@ export function formatWhen(iso: string): string {
   if (mins < 1440) return `${Math.round(mins / 60)}h ago`;
   if (mins < 10080) return `${Math.round(mins / 1440)}d ago`;
   return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+export function formatOpenCount(n: number): string {
+  if (n <= 0) return "Not opened yet";
+  if (n === 1) return "Opened once";
+  return `Opened ${n} times`;
 }

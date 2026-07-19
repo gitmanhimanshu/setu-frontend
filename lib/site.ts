@@ -98,7 +98,7 @@ export const TOOLS: Tool[] = [
       "Who you are, your role, saved link, plan, and remaining quota. The assistant should call this first — everything else depends on it.",
     input: [],
     output:
-      "email, name, role, link, link_saved, link_required, plan, subscribed_at, subscription_ends_at, total_sent, free_remaining, sent_last_24h, daily_limit, remaining_today, setup_needed",
+      "email, name, role, link, default_link_name, links[], link_saved, link_required, plan, subscribed_at, subscription_ends_at, total_sent, free_remaining, sent_last_24h, daily_limit, remaining_today, setup_needed",
     example: `{
   "email": "you@gmail.com",
   "name": "Himanshu Yadav",
@@ -144,7 +144,7 @@ export const TOOLS: Tool[] = [
   {
     name: "save_link",
     purpose:
-      "Saves the URL appended to every email. What it is depends on the role — a resume for a job seeker, a job description for a recruiter, a portfolio for a professional. Setu fetches it to check the recipient could actually open it, so a private Drive file is rejected here rather than silently failing in someone's inbox.",
+      "Saves a URL the server can attach to emails. What it is depends on the role — a resume for a job seeker, a job description for a recruiter, a portfolio for a professional. You can save multiple named links and choose which one is the default.",
     input: [
       {
         name: "link",
@@ -152,15 +152,69 @@ export const TOOLS: Tool[] = [
         required: true,
         desc: "Public http(s) URL — Drive, Dropbox, personal site",
       },
+      {
+        name: "name",
+        type: "string",
+        required: false,
+        desc: "Optional saved name like default, backend, design",
+      },
+      {
+        name: "make_default",
+        type: "bool",
+        required: false,
+        desc: "Whether this saved link becomes the default attached link",
+      },
     ],
-    output: "success, link, link_label, detail — or an error explaining the rejection",
+    output: "success, name, link, is_default, default_link_name, links[], link_label, detail — or an error explaining the rejection",
     example: `{
-  "success": false,
-  "error": "This link is not shared publicly — it redirects to a
-   sign-in page, so the recipient would see 'Request access'
-   instead of the file. Open it in Drive, click Share, and set
-   'Anyone with the link' to Viewer.",
-  "link": "https://drive.google.com/file/d/…"
+  "success": true,
+  "name": "backend",
+  "link": "https://drive.google.com/file/d/…",
+  "is_default": false,
+  "default_link_name": "default"
+}`,
+  },
+  {
+    name: "list_saved_links",
+    purpose:
+      "Lists every saved link for this user and marks which one is the default.",
+    input: [],
+    output: "default_link_name, default_link, links[]",
+    example: `{
+  "default_link_name": "default",
+  "default_link": "https://drive.google.com/file/d/…",
+  "links": [
+    { "name": "default", "url": "https://drive.google.com/file/d/…", "is_default": true },
+    { "name": "backend", "url": "https://resume.example/backend.pdf", "is_default": false }
+  ]
+}`,
+  },
+  {
+    name: "set_default_link",
+    purpose:
+      "Changes which saved link is attached by default on future sends.",
+    input: [
+      { name: "name", type: "string", required: true, desc: "Saved link name" },
+    ],
+    output: "success, default_link_name, link, links[]",
+    example: `{
+  "success": true,
+  "default_link_name": "backend",
+  "link": "https://resume.example/backend.pdf"
+}`,
+  },
+  {
+    name: "delete_link",
+    purpose:
+      "Deletes one saved link by name. If it was the default, Setu promotes another saved link or clears the default.",
+    input: [
+      { name: "name", type: "string", required: true, desc: "Saved link name" },
+    ],
+    output: "success, deleted, default_link_name, link, links[]",
+    example: `{
+  "success": true,
+  "deleted": "design",
+  "default_link_name": "backend"
 }`,
   },
   {
@@ -198,9 +252,10 @@ export const TOOLS: Tool[] = [
       { name: "body", type: "string", required: true, desc: "Plain text body" },
       { name: "company", type: "string", required: false, desc: "For your history" },
       { name: "source_url", type: "string", required: false, desc: "Where the address came from" },
+      { name: "link_name", type: "string", required: false, desc: "Which saved link to attach for this send" },
       { name: "include_link", type: "bool", required: false, desc: "Default true. false = don't append your saved link (general messages)" },
     ],
-    output: "success, to, subject, message_id — or success:false with error",
+    output: "success, to, subject, message_id, link_name, track_id — or success:false with error",
     example: `{
   "success": true,
   "to": "careers@acme.com",
@@ -218,7 +273,7 @@ export const TOOLS: Tool[] = [
         name: "applications",
         type: "Application[]",
         required: true,
-        desc: "Each: to, subject, body, company, source_url — max 25",
+        desc: "Each: to, subject, body, company, source_url, optional link_name — max 25",
       },
       {
         name: "delay_seconds",
@@ -252,7 +307,7 @@ export const TOOLS: Tool[] = [
       "Your numbers at a glance — lifetime and last-24h sends, companies reached, failures, remaining quota, plan, and the last few sends. The assistant calls this when you ask \"how many emails have I sent?\" or \"show my stats\".",
     input: [],
     output:
-      "email, name, plan, total_sent, total_failed, companies_reached, sent_last_24h, daily_limit, remaining_today, free_remaining, subscription_ends_at, recent[5]",
+      "email, name, plan, total_sent, total_failed, total_opens, opened_sends, companies_reached, sent_last_24h, daily_limit, remaining_today, free_remaining, subscription_ends_at, recent[5]",
     example: `{
   "plan": "free",
   "total_sent": 12,
