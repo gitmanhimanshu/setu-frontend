@@ -24,6 +24,13 @@ const columns = [
       { href: "/#faq", label: "FAQ" },
     ],
   },
+  {
+    title: "Legal",
+    links: [
+      { href: "/privacy", label: "Privacy policy" },
+      { href: "/terms", label: "Terms of service" },
+    ],
+  },
 ];
 
 const external = [
