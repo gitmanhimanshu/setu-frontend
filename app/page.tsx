@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  BarChart3,
   CheckCircle2,
   Clock,
   Eye,
@@ -22,6 +21,7 @@ import Logo from "@/components/Logo";
 import { AnimatedTerminal } from "@/components/CodeWindow";
 import Faq from "@/components/Faq";
 import Reveal from "@/components/Reveal";
+import SignalPreview from "@/components/SignalPreview";
 import { CLIENTS, LIMITS, MCP_URL, TAGLINE, GITHUB_URL } from "@/lib/site";
 
 const features = [
@@ -185,19 +185,24 @@ export default function Home() {
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] text-xs font-semibold mb-5">
                   <Eye size={13} />
-                  OPEN TRACKING
+                  FOLLOW-UP SIGNALS
                 </div>
 
                 <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight leading-[1.1]">
-                  Know who opened
+                  Know exactly when
                   <br />
-                  <span className="text-[var(--accent)]">your resume.</span>
+                  <span className="text-[var(--accent)]">to follow up.</span>
                 </h2>
 
                 <p className="mt-5 text-[var(--text-secondary)] leading-relaxed max-w-lg">
-                  Every resume link is wrapped with a tracker. When HR opens it, Setu
-                  records the click, counts how many times, and tells you exactly when
-                  they looked — then redirects them to your actual resume.
+                  Every link you send is tracked. But a number on its own tells you
+                  nothing — so Setu reads it for you.
+                </p>
+                <p className="mt-4 text-[var(--text-secondary)] leading-relaxed max-w-lg">
+                  Opened four times this afternoon? Someone is passing your resume
+                  around — follow up today. Sent five days ago and never opened? That
+                  isn&apos;t rejection, it&apos;s a wrong address or a spam folder, and
+                  it&apos;s fixable.
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-3">
@@ -217,64 +222,10 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Live tracking preview */}
+              {/* Follow-up signals preview */}
               <div className="flex items-center justify-center">
                 <Reveal delay={0.15}>
-                  <div className="w-full max-w-sm">
-                    <div className="rounded-xl border border-[var(--border)] bg-[var(--plane)] shadow-[var(--shadow-lg)] overflow-hidden">
-                      {/* Header */}
-                      <div className="px-4 py-3 border-b border-[var(--border)] bg-[var(--surface)]">
-                        <div className="flex items-center gap-2">
-                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--critical)]" />
-                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--warning)]" />
-                          <div className="w-2.5 h-2.5 rounded-full bg-[var(--good)]" />
-                          <span className="ml-2 text-xs text-[var(--text-muted)] font-medium">Recent Sends</span>
-                        </div>
-                      </div>
-
-                      {/* Fake send rows */}
-                      <div className="divide-y divide-[var(--border)]">
-                        <TrackingRow
-                          email="hr@acme.com"
-                          company="Acme Corp"
-                          opens={3}
-                          time="2m ago"
-                          status="opened"
-                        />
-                        <TrackingRow
-                          email="careers@startup.io"
-                          company="Startup Inc"
-                          opens={1}
-                          time="1h ago"
-                          status="opened"
-                        />
-                        <TrackingRow
-                          email="jobs@bigco.com"
-                          company="BigCo"
-                          opens={0}
-                          time="3h ago"
-                          status="pending"
-                        />
-                      </div>
-
-                      {/* Footer stats */}
-                      <div className="px-4 py-3 bg-[var(--surface)] border-t border-[var(--border)]">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-[var(--text-muted)]">This week</span>
-                          <div className="flex items-center gap-3">
-                            <span className="flex items-center gap-1 text-[var(--good-text)]">
-                              <Eye size={11} />
-                              <span className="font-semibold">12 opens</span>
-                            </span>
-                            <span className="flex items-center gap-1 text-[var(--accent)]">
-                              <BarChart3 size={11} />
-                              <span className="font-semibold">4 companies</span>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <SignalPreview />
                 </Reveal>
               </div>
             </div>
@@ -552,44 +503,6 @@ function Item({ children, ok = false }: { children: React.ReactNode; ok?: boolea
   );
 }
 
-function TrackingRow({
-  email,
-  company,
-  opens,
-  time,
-  status,
-}: {
-  email: string;
-  company: string;
-  opens: number;
-  time: string;
-  status: "opened" | "pending";
-}) {
-  return (
-    <div className="px-4 py-3 flex items-center gap-3">
-      <span
-        className="shrink-0 grid place-items-center w-7 h-7 rounded-full text-white text-[10px] font-bold"
-        style={{ background: status === "opened" ? "var(--good)" : "var(--text-muted)" }}
-      >
-        {status === "opened" ? <Eye size={12} /> : <Eye size={12} />}
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium truncate">{email}</p>
-        <p className="text-[11px] text-[var(--text-muted)]">{company}</p>
-      </div>
-      <div className="text-right shrink-0">
-        {opens > 0 ? (
-          <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--good-text)]">
-            {opens} open{opens > 1 ? "s" : ""}
-          </span>
-        ) : (
-          <span className="text-xs text-[var(--text-muted)]">waiting</span>
-        )}
-        <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{time}</p>
-      </div>
-    </div>
-  );
-}
 
 function Fact({
   icon: Icon,
