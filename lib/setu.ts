@@ -141,3 +141,65 @@ export function formatOpenCount(n: number): string {
   if (n === 1) return "Opened once";
   return `Opened ${n} times`;
 }
+
+/* --- Uploaded files -------------------------------------------------------
+ *
+ * For the resume that only exists on the user's computer. An assistant can
+ * never do this: it receives a PDF's extracted text, never the bytes, so the
+ * browser is the only place the real file can enter the system.
+ */
+
+export type StoredFile = {
+  id: string;
+  filename: string;
+  content_type: string;
+  size: number;
+  created_at: string;
+};
+
+export type FilesResponse = {
+  files: StoredFile[];
+  storage_used: number;
+  storage_limit: number;
+  max_files: number;
+  max_file_bytes: number;
+};
+
+export function fileUrl(id: string): string {
+  return `${SETU_URL}/f/${id}`;
+}
+
+export async function fetchFiles(accessToken: string): Promise<FilesResponse> {
+  const res = await fetch(`${SETU_URL}/api/files`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    cache: "no-store",
+  });
+  return parseResponse<FilesResponse>(res);
+}
+
+export async function uploadFile(
+  accessToken: string,
+  file: File
+): Promise<{ id: string; filename: string; size: number; url: string }> {
+  const body = new FormData();
+  body.append("file", file);
+  // Content-Type is deliberately unset: the browser must add the multipart
+  // boundary itself, and setting it by hand breaks the parse server-side.
+  const res = await fetch(`${SETU_URL}/api/files`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body,
+  });
+  return parseResponse(res);
+}
+
+export async function deleteFile(
+  accessToken: string,
+  id: string
+): Promise<{ success: boolean }> {
+  const res = await fetch(`${SETU_URL}/api/files/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return parseResponse(res);
+}

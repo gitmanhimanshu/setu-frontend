@@ -34,6 +34,7 @@ import {
   type Stats,
 } from "@/lib/setu";
 import { requestAccessToken } from "@/lib/google";
+import FilesCard from "@/components/FilesCard";
 
 const TOKEN_KEY = "setu_token";
 
@@ -260,6 +261,7 @@ function Panel({
         <aside className="space-y-4 lg:sticky lg:top-24 min-w-0">
           <AccountCard stats={stats} />
           <LinksCard stats={stats} token={token} onSaved={load} />
+          <FilesCard token={token} onExpired={onSignOut} />
         </aside>
       </div>
     </main>

@@ -144,7 +144,7 @@ export const TOOLS: Tool[] = [
   {
     name: "save_link",
     purpose:
-      "Saves a URL the server can attach to emails. What it is depends on the role — a resume for a job seeker, a job description for a recruiter, a portfolio for a professional. You can save multiple named links and choose which one is the default.",
+      "Saves a URL the server can attach to emails. What it is depends on the role — a resume for a job seeker, a job description for a recruiter, a portfolio for a professional. Save as many named links as you like and mark one default. Give each a description of what it emphasises, and the assistant can match the right one to a job description instead of guessing from the name.",
     input: [
       {
         name: "link",
@@ -157,6 +157,12 @@ export const TOOLS: Tool[] = [
         type: "string",
         required: false,
         desc: "Optional saved name like default, backend, design",
+      },
+      {
+        name: "description",
+        type: "string",
+        required: false,
+        desc: "What this version emphasises — \"backend: Postgres, Go, queues\". Used to match a resume to a job description",
       },
       {
         name: "make_default",
@@ -177,15 +183,17 @@ export const TOOLS: Tool[] = [
   {
     name: "list_saved_links",
     purpose:
-      "Lists every saved link for this user and marks which one is the default.",
+      "Lists every saved link with its description and marks which is default. Called before sending when several resumes exist, so the assistant can read each description against the job description and pick the closest — or ask you when none clearly fits.",
     input: [],
     output: "default_link_name, default_link, links[]",
     example: `{
   "default_link_name": "default",
   "default_link": "https://drive.google.com/file/d/…",
   "links": [
-    { "name": "default", "url": "https://drive.google.com/file/d/…", "is_default": true },
-    { "name": "backend", "url": "https://resume.example/backend.pdf", "is_default": false }
+    { "name": "backend", "url": "https://resume.example/backend.pdf",
+      "description": "Backend: Postgres, Go, queues", "is_default": true },
+    { "name": "frontend", "url": "https://resume.example/frontend.pdf",
+      "description": "Frontend: React, design systems", "is_default": false }
   ]
 }`,
   },
@@ -321,6 +329,29 @@ export const TOOLS: Tool[] = [
     { "to_email": "careers@acme.com", "company": "Acme",
       "success": true, "sent_at": "2026-07-19T09:22:04+00:00" }
   ]
+}`,
+  },
+  {
+    name: "get_link_activity",
+    purpose:
+      "Who has been opening the links you sent, and what to do about it. Reads the open count together with how recently it happened and how long ago the mail went out, then orders the list so the ones worth acting on come first. hot = opened several times, someone came back or forwarded it. warm = opened in the last couple of days. cold = sent days ago and never opened, which is usually a wrong address or a spam folder rather than disinterest.",
+    input: [
+      { name: "limit", type: "int", required: false, desc: "How many sends to read. Default 50" },
+    ],
+    output: "counts, needs_attention[], all[], note",
+    example: `{
+  "counts": { "hot": 1, "warm": 1, "cold": 1 },
+  "needs_attention": [
+    {
+      "company": "Acme Corp",
+      "signal": "hot",
+      "headline": "Acme Corp opened your link 4 times",
+      "action": "Strong interest — following up now is well timed.",
+      "open_count": 4
+    }
+  ],
+  "note": "An open means the tracked link was fetched. It is a
+   signal, not proof that the recipient read the email."
 }`,
   },
   {

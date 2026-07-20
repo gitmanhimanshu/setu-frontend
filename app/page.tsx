@@ -5,6 +5,7 @@ import {
   Clock,
   Eye,
   FileText,
+  Files,
   Gauge,
   KeyRound,
   Layers,
@@ -66,6 +67,11 @@ const features = [
     body: "You sign in on Google's page. Setu never sees a password, and stores no token — the OAuth layer issues a fresh one per request.",
   },
   {
+    icon: Files,
+    title: "A resume per kind of role",
+    body: "Save as many as you like — backend, frontend, general — each with a note on what it emphasises. Paste a job description and Setu picks the closest one, or asks you when nothing clearly fits.",
+  },
+  {
     icon: Reply,
     title: "Smart Follow-ups",
     body: "Since your send history is safely logged, you can effortlessly ask the AI to draft and send follow-up messages to previous contacts.",
@@ -90,7 +96,7 @@ const terminalLines = [
   { text: "\u2713 Opening Google sign-in\u2026", dim: true },
   { text: "\u2713 Granted: Send email on your behalf", dim: true },
   { text: "" },
-  { text: "8 tools available. Ask Claude to apply somewhere." },
+  { text: "Connected. Ask Claude to apply somewhere." },
 ];
 
 export default function Home() {
