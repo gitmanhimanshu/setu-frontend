@@ -79,6 +79,7 @@ const steps = [
   { n: 4, title: "Ask in plain language", body: "\u201CFind fintech startups hiring backend engineers and apply.\u201D Your assistant does the research." },
   { n: 5, title: "Read the drafts", body: "Every recipient and a full draft, before anything leaves. You approve." },
   { n: 6, title: "Sent as you", body: "Setu delivers through Gmail, paced and logged. Replies go straight to you." },
+  { n: 7, title: "Know when to follow up", body: "Setu tracks who opens your link. Five opens this afternoon means follow up today; nothing after five days means the address was wrong, not you." },
 ];
 
 const terminalLines = [
@@ -241,7 +242,8 @@ export default function Home() {
             How it works
           </h2>
           <p className="mt-4 text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-            Six steps, once. After that it&apos;s a sentence in a chat window.
+            Set up once. After that it&apos;s a sentence in a chat window — and
+            Setu tells you what happened next.
           </p>
         </Reveal>
 
