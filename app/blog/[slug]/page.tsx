@@ -4,12 +4,13 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
-    const postData = await getBlogData(params.slug);
+    const resolvedParams = await params;
+    const postData = await getBlogData(resolvedParams.slug);
     return {
       title: `${postData.title} | Setu Blog`,
       description: postData.description,
@@ -30,7 +31,8 @@ export async function generateStaticParams() {
 
 export default async function BlogPost({ params }: Props) {
   try {
-    const postData = await getBlogData(params.slug);
+    const resolvedParams = await params;
+    const postData = await getBlogData(resolvedParams.slug);
 
     return (
       <article className="max-w-3xl mx-auto py-16 px-4 sm:px-6 lg:px-8 min-h-screen">
