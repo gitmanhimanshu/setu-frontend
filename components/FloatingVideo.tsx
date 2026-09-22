@@ -89,8 +89,8 @@ export default function FloatingVideo() {
         onClick={() => {
           // Simple click tracking (can be connected to Posthog/GA)
           try {
-            if (typeof window !== "undefined" && window.gtag) {
-              window.gtag("event", "video_click", { video_name: "setu_demo" });
+            if (typeof window !== "undefined" && (window as any).gtag) {
+              (window as any).gtag("event", "video_click", { video_name: "setu_demo" });
             }
             console.log("Video Clicked (Tracked)");
           } catch (e) {}
