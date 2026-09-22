@@ -83,11 +83,11 @@ export default function Nav() {
               <span className="font-semibold text-[var(--text-primary)]">{AUTHOR.name}</span>
             </span>
             <a
-              href={AUTHOR.github}
+              href={GITHUB_URL}
               target="_blank"
               rel="noreferrer noopener"
               className="grid place-items-center w-7 h-7 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors"
-              aria-label="Author GitHub"
+              aria-label="Repository GitHub"
             >
               <GithubMark />
             </a>
