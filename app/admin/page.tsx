@@ -43,6 +43,7 @@ type Visitor = {
   path: string | null;
   user_agent: string | null;
   visit_count: number;
+  played_video: number | boolean;
   first_seen: string;
   last_seen: string;
 };
