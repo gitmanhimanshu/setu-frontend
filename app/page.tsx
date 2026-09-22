@@ -18,6 +18,7 @@ import {
 import Architecture from "@/components/Architecture";
 import Aurora from "@/components/Aurora";
 import ChatDemo from "@/components/ChatDemo";
+import FloatingVideo from "@/components/FloatingVideo";
 import Logo from "@/components/Logo";
 import { AnimatedTerminal } from "@/components/CodeWindow";
 import Faq from "@/components/Faq";
@@ -102,6 +103,7 @@ const terminalLines = [
 export default function Home() {
   return (
     <main>
+      <FloatingVideo />
       {/* Hero */}
       <section className="relative isolate">
         <Aurora />
