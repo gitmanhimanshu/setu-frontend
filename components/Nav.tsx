@@ -105,13 +105,13 @@ export default function Nav() {
           <div className="flex items-center gap-2">
             <ThemeToggle />
 
-            <button
-              onClick={() => setVideoOpen(true)}
+            <Link
+              href="/tutorials"
               className="hidden sm:inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-all"
             >
               <Play size={12} fill="currentColor" />
-              Tutorial
-            </button>
+              Tutorials
+            </Link>
 
             <Link
               href="/docs"
@@ -141,16 +141,14 @@ export default function Nav() {
                 {link.label}
               </Link>
             ))}
-            <button
-              onClick={() => {
-                setOpen(false);
-                setVideoOpen(true);
-              }}
+            <Link
+              href="/tutorials"
+              onClick={() => setOpen(false)}
               className="flex items-center gap-2 px-3 py-2 rounded-md text-[var(--text-secondary)] hover:bg-[var(--surface-2)] text-left"
             >
               <Play size={14} fill="currentColor" />
-              Watch Tutorial
-            </button>
+              Watch Tutorials
+            </Link>
             <div className="mt-2 pt-3 border-t border-[var(--border)] px-3 text-[var(--text-muted)] text-xs">
               built and maintained by <span className="font-semibold text-[var(--text-primary)]">{AUTHOR.name}</span>
             </div>

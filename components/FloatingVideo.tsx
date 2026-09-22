@@ -41,7 +41,7 @@ export default function FloatingVideo() {
       className={`fixed z-50 transition-all duration-300 ease-in-out shadow-2xl rounded-xl overflow-hidden border border-[var(--border-strong)] bg-[var(--surface)] flex flex-col
         ${isExpanded 
           ? "bottom-4 right-4 w-[calc(100vw-2rem)] sm:w-[500px] md:w-[600px] lg:w-[700px] max-h-[85vh]" 
-          : "bottom-4 right-4 w-72 sm:w-80 md:w-96 max-h-[40vh]"
+          : "bottom-4 right-4 w-72 sm:w-80 md:w-96 max-h-[60vh]"
         }
       `}
     >
@@ -55,19 +55,17 @@ export default function FloatingVideo() {
           <span className="text-xs font-semibold text-[var(--text-primary)]">See how Setu works</span>
         </div>
         <div className="flex items-center gap-1.5 text-[var(--text-secondary)]">
-          {isExpanded && (
-            <button 
-              onClick={() => setShowTranscript(!showTranscript)} 
-              className={`p-1 rounded transition-colors ${showTranscript ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'hover:bg-[var(--surface)] hover:text-[var(--text-primary)]'}`}
-              title="Toggle Captions"
-            >
-              <Captions size={14} />
-            </button>
-          )}
+          <button 
+            onClick={() => setShowTranscript(!showTranscript)} 
+            className={`p-1 rounded transition-colors ${showTranscript ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'hover:bg-[var(--surface)] hover:text-[var(--text-primary)]'}`}
+            title="Toggle Captions"
+          >
+            <Captions size={14} />
+          </button>
           <button 
             onClick={() => {
               setIsExpanded(!isExpanded);
-              if (!isExpanded) setShowTranscript(true);
+              if (!isExpanded && !showTranscript) setShowTranscript(true);
             }} 
             className="p-1 hover:bg-[var(--surface)] hover:text-[var(--text-primary)] rounded transition-colors"
             title={isExpanded ? "Shrink" : "Expand"}
@@ -85,7 +83,19 @@ export default function FloatingVideo() {
       </div>
 
       {/* Loom Iframe */}
-      <div className="relative shrink-0 w-full bg-black" style={{ paddingBottom: "56.25%" }}>
+      <div 
+        className="relative shrink-0 w-full bg-black" 
+        style={{ paddingBottom: "56.25%" }}
+        onClick={() => {
+          // Simple click tracking (can be connected to Posthog/GA)
+          try {
+            if (typeof window !== "undefined" && window.gtag) {
+              window.gtag("event", "video_click", { video_name: "setu_demo" });
+            }
+            console.log("Video Clicked (Tracked)");
+          } catch (e) {}
+        }}
+      >
         <iframe
           src="https://www.loom.com/embed/9c5cf49cefd149a2a4395b97fb81b1f9?hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true"
           frameBorder="0"
@@ -95,7 +105,7 @@ export default function FloatingVideo() {
       </div>
 
       {/* Transcript Section */}
-      {isExpanded && showTranscript && (
+      {showTranscript && (
         <div className="flex-1 overflow-y-auto p-4 bg-[var(--surface)] border-t border-[var(--border)] text-sm space-y-3 min-h-[150px]">
           {transcript.map((item, idx) => (
             <div key={idx} className="flex gap-3 items-start">
