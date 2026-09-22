@@ -1,33 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Maximize2, Minimize2, Captions } from "lucide-react";
-
-const transcript = [
-  { time: "0:00", text: "How you can use, let me show you, how you can use Setu efficiently. So, you can see, like, ah, if I am going on Plugins." },
-  { time: "0:11", text: "So, I connected, ah, ah, multiple Plugins, like, you know, Firecrawl, Indeed, Nokri, and, ah, LinkedIn, also, also, like, ah, the type of, ah, Plugins I connected." },
-  { time: "0:29", text: "And, ah, I can see, I can do the only this. If you like to find my job, I find jobs on LinkedIn, according to my experience, and, so, by this, you can write only this." },
-  { time: "0:54", text: "Basically, I, uh, uh, given my contact or resume already, so you can give your resume here, PDF file, and, uh, write this prompt only, and it will find." },
-  { time: "1:08", text: "And it will, uh, find jobs for you, and, uh, latest job for me, and it will find our jobs, like, it is searching, and it is verifying your, uh, company emails." },
-  { time: "1:34", text: "And, uh, it is verifying, and it is sending. And, uh, next, Kin and Handel, Context, their company name. And, using LinkedIn Naukri, you can find all jobs, and it is just send it, or it automatically, no, it will, uh, write, uh, based on that job profile automatically." },
-  { time: "1:54", text: "Setu dashboard, I can see, like, it is send it. Like, I refresh. Like, it is send it at max. Like, uh, that company, it is send it." },
-  { time: "2:19", text: "And, uh, it will track also which, uh, HR opens or not. Like, this HR opens, this HR opens four times." },
-  { time: "2:24", text: "We can go. Follow, uh, like, it is interested. So, it opens, uh, four times. And, uh, you go on your email and refresh also here." },
-  { time: "2:36", text: "Like, if you refresh here. And, you can see, it is open. It is written, like, uh, based on your profile, like, uh, based on your file and your application ID." },
-  { time: "2:48", text: "You don't need to write explicitly. Like, it is written for these two applications, different type. And, it is written in this different type." },
-  { time: "2:56", text: "So, you can automate, and you can tell, like, uh, find the latest footage, five mails, media, LinkedIn, and send the mail." },
-  { time: "3:09", text: "You can write only this. And, it will do it automatically. No need to worry. Like, I, I can send, uh, eighty to a hundred applications in only ten minutes." },
-  { time: "3:24", text: "Yeah. You can find it from LinkedIn. Yeah, you can, like, uh, replace in three hundred, uh, uh, send three I replied, and it will send you all." },
-  { time: "3:45", text: "Keep verifying emails, because, uh, verifying emails is also important." },
-  { time: "3:56", text: "There may be fake emails also. Yeah, it is done, like, three applications it is done, already deployed, and zero RMS." },
-  { time: "4:11", text: "Already it is ended, and you can see in there your portal. Yeah, it is opens your email or not. It opens like it is not opened." },
-  { time: "4:38", text: "Thank you." },
-];
+import { X, Maximize2, Minimize2 } from "lucide-react";
 
 export default function FloatingVideo() {
   const [isDismissed, setIsDismissed] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [showTranscript, setShowTranscript] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -56,17 +34,7 @@ export default function FloatingVideo() {
         </div>
         <div className="flex items-center gap-1.5 text-[var(--text-secondary)]">
           <button 
-            onClick={() => setShowTranscript(!showTranscript)} 
-            className={`p-1 rounded transition-colors ${showTranscript ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'hover:bg-[var(--surface)] hover:text-[var(--text-primary)]'}`}
-            title="Toggle Captions"
-          >
-            <Captions size={14} />
-          </button>
-          <button 
-            onClick={() => {
-              setIsExpanded(!isExpanded);
-              if (!isExpanded && !showTranscript) setShowTranscript(true);
-            }} 
+            onClick={() => setIsExpanded(!isExpanded)} 
             className="p-1 hover:bg-[var(--surface)] hover:text-[var(--text-primary)] rounded transition-colors"
             title={isExpanded ? "Shrink" : "Expand"}
           >
@@ -82,7 +50,7 @@ export default function FloatingVideo() {
         </div>
       </div>
 
-      {/* Loom Iframe with Transcript Overlay */}
+      {/* Loom Iframe */}
       <div 
         className="relative shrink-0 w-full bg-black overflow-hidden" 
         style={{ paddingBottom: "56.25%" }}
@@ -102,20 +70,6 @@ export default function FloatingVideo() {
           allowFullScreen
           className="absolute top-0 left-0 w-full h-full"
         ></iframe>
-
-        {/* Transcript Overlay */}
-        {showTranscript && (
-          <div className="absolute bottom-[40px] left-2 right-2 sm:bottom-[50px] sm:left-4 sm:right-4 max-h-[50%] overflow-y-auto rounded-lg bg-black/75 backdrop-blur-md border border-white/10 text-[13px] sm:text-sm space-y-2 p-3 sm:p-4 z-10 custom-scrollbar pointer-events-auto">
-            {transcript.map((item, idx) => (
-              <div key={idx} className="flex gap-2 sm:gap-3 items-start">
-                <span className="text-[10px] sm:text-xs font-mono font-medium text-yellow-400 bg-yellow-400/10 px-1.5 py-0.5 rounded shrink-0 mt-0.5">
-                  {item.time}
-                </span>
-                <p className="text-white/95 leading-relaxed drop-shadow-md">{item.text}</p>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
