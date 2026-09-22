@@ -435,6 +435,7 @@ function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
                     <Th>IP</Th>
                     <Th className="text-right">Visits</Th>
                     <Th>Last page</Th>
+                    <Th className="text-center">Played video</Th>
                     <Th>Last seen</Th>
                     <Th>First seen</Th>
                   </tr>
@@ -461,6 +462,13 @@ function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
                       </td>
                       <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
                         {v.path ?? "—"}
+                      </td>
+                      <td className="px-4 py-3 align-top text-center">
+                        {v.played_video ? (
+                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[var(--accent)] text-[var(--surface)] text-xs font-bold">✓</span>
+                        ) : (
+                          <span className="text-[var(--text-muted)]">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
                         {formatWhen(v.last_seen)}

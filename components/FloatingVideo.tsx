@@ -2,15 +2,33 @@
 
 import { useState, useEffect } from "react";
 import { X, Maximize2, Minimize2 } from "lucide-react";
+import { SETU_URL } from "@/lib/site";
 
 export default function FloatingVideo() {
   const [isDismissed, setIsDismissed] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [tracked, setTracked] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const trackPlay = () => {
+    if (tracked) return;
+    setTracked(true);
+    fetch(`${SETU_URL}/api/visit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ played_video: true, path: window.location.pathname }),
+    }).catch(() => {});
+  };
+
+  // Track if they expand the video
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+    if (!isExpanded) trackPlay();
+  };
 
   if (!mounted || isDismissed) return null;
 
@@ -22,6 +40,7 @@ export default function FloatingVideo() {
           : "bottom-4 right-4 w-72 sm:w-80 md:w-96 max-h-[60vh]"
         }
       `}
+      onMouseEnter={trackPlay} // Fallback: if they hover the floating video, it implies they are interacting with it
     >
       {/* Header bar */}
       <div className="flex items-center justify-between px-3 py-2 bg-[var(--surface-2)] border-b border-[var(--border)] shrink-0">
@@ -34,7 +53,7 @@ export default function FloatingVideo() {
         </div>
         <div className="flex items-center gap-1.5 text-[var(--text-secondary)]">
           <button 
-            onClick={() => setIsExpanded(!isExpanded)} 
+            onClick={toggleExpand} 
             className="p-1 hover:bg-[var(--surface)] hover:text-[var(--text-primary)] rounded transition-colors"
             title={isExpanded ? "Shrink" : "Expand"}
           >

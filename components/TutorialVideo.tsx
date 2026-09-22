@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Captions } from "lucide-react";
+import { SETU_URL } from "@/lib/site";
 
 interface TranscriptItem {
   time: string;
@@ -18,9 +19,20 @@ interface TutorialVideoProps {
 
 export default function TutorialVideo({ title, description, src, isLoom, transcript }: TutorialVideoProps) {
   const [showTranscript, setShowTranscript] = useState(false);
+  const [tracked, setTracked] = useState(false);
+
+  const trackPlay = () => {
+    if (tracked) return;
+    setTracked(true);
+    fetch(`${SETU_URL}/api/visit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ played_video: true, path: window.location.pathname }),
+    }).catch(() => {});
+  };
 
   return (
-    <section>
+    <section onMouseEnter={trackPlay} onClick={trackPlay}>
       <div className="flex items-start justify-between mb-2">
         <div>
           <h2 className="text-xl font-semibold">{title}</h2>
