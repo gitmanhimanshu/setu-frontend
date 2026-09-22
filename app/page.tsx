@@ -347,6 +347,31 @@ export default function Home() {
         </Reveal>
       </section>
 
+      {/* Job Platforms Integration */}
+      <section className="mx-auto max-w-6xl px-6 py-20 border-t border-[var(--border)]">
+        <Reveal>
+          <div className="flex flex-col items-center text-center">
+            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-[var(--surface-2)] border border-[var(--border)] mb-6 font-semibold shadow-sm text-sm sm:text-base whitespace-nowrap overflow-x-auto max-w-full">
+              <span className="text-[#0a66c2]">LinkedIn</span>
+              <span className="text-gray-400">+</span>
+              <span className="text-[#f16522]">Naukri</span>
+              <span className="text-gray-400">+</span>
+              <span className="text-[#2164f4]">Indeed</span>
+              <span className="text-gray-400">+</span>
+              <span className="text-black dark:text-white">Setu</span>
+              <span className="text-gray-400">=</span>
+              <span className="text-green-600">Your Dream Job</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+              Automate your entire job hunt
+            </h2>
+            <p className="mt-4 text-[var(--text-secondary)] max-w-2xl leading-relaxed">
+              Setu bridges the gap between job portals and your inbox. Use LLMs to extract job requirements and recruiter emails directly from LinkedIn, Naukri, and Indeed. Then, let Setu instantly generate and send the perfect, personalized application.
+            </p>
+          </div>
+        </Reveal>
+      </section>
+
       {/* Features */}
       <section className="mx-auto max-w-6xl px-6 py-20 border-t border-[var(--border)]">
         <Reveal>
