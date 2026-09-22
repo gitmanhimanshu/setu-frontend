@@ -348,25 +348,71 @@ export default function Home() {
       </section>
 
       {/* Job Platforms Integration */}
-      <section className="mx-auto max-w-6xl px-6 py-20 border-t border-[var(--border)]">
+      <section className="mx-auto max-w-6xl px-6 py-24 border-t border-[var(--border)] bg-gradient-to-b from-[var(--surface)] to-[var(--surface-2)]">
         <Reveal>
           <div className="flex flex-col items-center text-center">
-            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-[var(--surface-2)] border border-[var(--border)] mb-6 font-semibold shadow-sm text-sm sm:text-base whitespace-nowrap overflow-x-auto max-w-full">
-              <span className="text-[#0a66c2]">LinkedIn</span>
+            {/* Connection Pipeline */}
+            <div className="flex flex-wrap items-center justify-center gap-4 px-6 py-4 rounded-2xl bg-white dark:bg-black border border-[var(--border-strong)] mb-10 shadow-lg max-w-full font-bold text-lg">
+              
+              {/* Firecrawl */}
+              <div className="flex items-center gap-2">
+                <span className="text-[#ff4f00] flex items-center gap-1">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  Firecrawl
+                </span>
+              </div>
               <span className="text-gray-400">+</span>
-              <span className="text-[#f16522]">Naukri</span>
+
+              {/* LinkedIn */}
+              <div className="flex items-center gap-2">
+                <span className="text-[#0a66c2] flex items-center gap-1">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                  LinkedIn
+                </span>
+              </div>
               <span className="text-gray-400">+</span>
-              <span className="text-[#2164f4]">Indeed</span>
+
+              {/* Naukri */}
+              <div className="flex items-center gap-2">
+                <span className="text-[#f16522] flex items-center gap-1">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                  Naukri
+                </span>
+              </div>
               <span className="text-gray-400">+</span>
-              <span className="text-black dark:text-white">Setu</span>
+
+              {/* Indeed */}
+              <div className="flex items-center gap-2">
+                <span className="text-[#2164f4] flex items-center gap-1">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M11.996 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12 12 12 0 0 0-12-12zm-3.2 17.6H5.6V8.8h3.2v8.8zm-.2-10.4a1.8 1.8 0 1 1 .001-3.601A1.8 1.8 0 0 1 8.6 7.2zm9.8 10.4h-3.2v-4.8c0-1.14-.02-2.6-1.58-2.6-1.58 0-1.82 1.24-1.82 2.52v4.88H8.6V8.8h3.08v1.2h.04c.42-.8 1.46-1.64 3-1.64 3.2 0 3.8 2.1 3.8 4.84v4.4z"/></svg>
+                  Indeed
+                </span>
+              </div>
+              <span className="text-gray-400">+</span>
+
+              {/* Setu */}
+              <div className="flex items-center gap-2">
+                <span className="text-black dark:text-white flex items-center gap-1">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                  Setu
+                </span>
+              </div>
               <span className="text-gray-400">=</span>
-              <span className="text-green-600">Your Dream Job</span>
+
+              {/* Dream Job */}
+              <div className="flex items-center gap-2">
+                <span className="text-green-600 flex items-center gap-1 bg-green-50 dark:bg-green-900/20 px-3 py-1 rounded-lg">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"/></svg>
+                  Your Dream Job
+                </span>
+              </div>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+
+            <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[var(--text-primary)]">
               Automate your entire job hunt
             </h2>
-            <p className="mt-4 text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-              Setu bridges the gap between job portals and your inbox. Use LLMs to extract job requirements and recruiter emails directly from LinkedIn, Naukri, and Indeed. Then, let Setu instantly generate and send the perfect, personalized application.
+            <p className="mt-6 text-lg text-[var(--text-secondary)] max-w-3xl leading-relaxed">
+              Setu bridges the gap between job portals and your inbox. Use <strong>Firecrawl</strong> and LLMs to scrape job requirements and extract recruiter emails directly from LinkedIn, Naukri, and Indeed. Then, let Setu instantly generate and send the perfect, highly-personalized application on your behalf.
             </p>
           </div>
         </Reveal>
