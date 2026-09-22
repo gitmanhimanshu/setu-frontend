@@ -27,7 +27,7 @@ const transcript = [
 export default function FloatingVideo() {
   const [isDismissed, setIsDismissed] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [showTranscript, setShowTranscript] = useState(false);
+  const [showTranscript, setShowTranscript] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -82,9 +82,9 @@ export default function FloatingVideo() {
         </div>
       </div>
 
-      {/* Loom Iframe */}
+      {/* Loom Iframe with Transcript Overlay */}
       <div 
-        className="relative shrink-0 w-full bg-black" 
+        className="relative shrink-0 w-full bg-black overflow-hidden" 
         style={{ paddingBottom: "56.25%" }}
         onClick={() => {
           // Simple click tracking (can be connected to Posthog/GA)
@@ -102,21 +102,21 @@ export default function FloatingVideo() {
           allowFullScreen
           className="absolute top-0 left-0 w-full h-full"
         ></iframe>
-      </div>
 
-      {/* Transcript Section */}
-      {showTranscript && (
-        <div className="flex-1 overflow-y-auto p-4 bg-[var(--surface)] border-t border-[var(--border)] text-sm space-y-3 min-h-[150px]">
-          {transcript.map((item, idx) => (
-            <div key={idx} className="flex gap-3 items-start">
-              <span className="text-xs font-mono text-[var(--accent)] bg-[var(--accent)]/10 px-1.5 py-0.5 rounded mt-0.5 shrink-0">
-                {item.time}
-              </span>
-              <p className="text-[var(--text-secondary)] leading-relaxed">{item.text}</p>
-            </div>
-          ))}
-        </div>
-      )}
+        {/* Transcript Overlay */}
+        {showTranscript && (
+          <div className="absolute bottom-[40px] left-2 right-2 sm:bottom-[50px] sm:left-4 sm:right-4 max-h-[50%] overflow-y-auto rounded-lg bg-black/75 backdrop-blur-md border border-white/10 text-[13px] sm:text-sm space-y-2 p-3 sm:p-4 z-10 custom-scrollbar pointer-events-auto">
+            {transcript.map((item, idx) => (
+              <div key={idx} className="flex gap-2 sm:gap-3 items-start">
+                <span className="text-[10px] sm:text-xs font-mono font-medium text-yellow-400 bg-yellow-400/10 px-1.5 py-0.5 rounded shrink-0 mt-0.5">
+                  {item.time}
+                </span>
+                <p className="text-white/95 leading-relaxed drop-shadow-md">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

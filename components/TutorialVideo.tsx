@@ -17,7 +17,7 @@ interface TutorialVideoProps {
 }
 
 export default function TutorialVideo({ title, description, src, isLoom, transcript }: TutorialVideoProps) {
-  const [showTranscript, setShowTranscript] = useState(false);
+  const [showTranscript, setShowTranscript] = useState(true);
 
   return (
     <section>
@@ -61,21 +61,21 @@ export default function TutorialVideo({ title, description, src, isLoom, transcr
               Your browser does not support the video tag.
             </video>
           )}
-        </div>
 
-        {/* Transcript Panel */}
-        {showTranscript && transcript && transcript.length > 0 && (
-          <div className="overflow-y-auto max-h-[300px] p-5 bg-[var(--surface)] border-t border-[var(--border)] text-sm space-y-4">
-            {transcript.map((item, idx) => (
-              <div key={idx} className="flex gap-4 items-start">
-                <span className="text-xs font-mono font-medium text-[var(--accent)] bg-[var(--accent)]/10 px-2 py-0.5 rounded shrink-0 mt-0.5">
-                  {item.time}
-                </span>
-                <p className="text-[var(--text-secondary)] leading-relaxed">{item.text}</p>
-              </div>
-            ))}
-          </div>
-        )}
+          {/* Transcript Overlay */}
+          {showTranscript && transcript && transcript.length > 0 && (
+            <div className="absolute bottom-[50px] left-4 right-4 max-h-[50%] overflow-y-auto rounded-lg bg-black/75 backdrop-blur-md border border-white/10 text-sm space-y-3 p-4 z-10 custom-scrollbar pointer-events-auto">
+              {transcript.map((item, idx) => (
+                <div key={idx} className="flex gap-3 items-start">
+                  <span className="text-xs font-mono font-medium text-yellow-400 bg-yellow-400/10 px-1.5 py-0.5 rounded shrink-0 mt-0.5">
+                    {item.time}
+                  </span>
+                  <p className="text-white/95 leading-relaxed drop-shadow-md">{item.text}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
