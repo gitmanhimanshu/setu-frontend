@@ -74,6 +74,13 @@ export default function TutorialsPage() {
 
         <div className="space-y-16">
           <TutorialVideo
+            title="Setu Tutorial for Claude"
+            description="Watch how to configure the Setu MCP server within Claude Desktop."
+            src="https://res.cloudinary.com/dbizsbr3w/video/upload/v1784450250/New_chat_-_Claude_-_Google_Chrome_2026-07-19_13-39-07_pbqmwl.mp4"
+            isLoom={false}
+          />
+
+          <TutorialVideo
             title="Time Saving: Send applications with just a screenshot"
             description="See how you can save time by providing just a screenshot and a little context to automate email sending based on job profiles."
             src="https://www.loom.com/embed/2c9ef434e88746bca274bbc4f52fc00b?hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true"
@@ -87,13 +94,6 @@ export default function TutorialsPage() {
             src="https://www.loom.com/embed/9c5cf49cefd149a2a4395b97fb81b1f9?hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true"
             isLoom={true}
             transcript={TRANSCRIPT_1}
-          />
-
-          <TutorialVideo
-            title="Setu Tutorial for Claude"
-            description="Watch how to configure the Setu MCP server within Claude Desktop."
-            src="https://res.cloudinary.com/dbizsbr3w/video/upload/v1784450250/New_chat_-_Claude_-_Google_Chrome_2026-07-19_13-39-07_pbqmwl.mp4"
-            isLoom={false}
           />
         </div>
       </main>
