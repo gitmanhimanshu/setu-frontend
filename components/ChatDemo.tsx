@@ -13,31 +13,31 @@ type Turn =
 const script: Turn[] = [
   {
     kind: "user",
-    text: "Acme is hiring a backend engineer. Apply for me.",
+    text: "Here is a job posting from Naukri and a recruiter's LinkedIn profile. Find the email and apply for me.",
   },
   {
     kind: "tool",
-    name: "get_my_profile",
-    result: "resume_link saved · 68 of 80 left today",
+    name: "extract_linkedin_email",
+    result: "Found jane.doe@acme.com on LinkedIn. Email validated.",
   },
   {
     kind: "tool",
-    name: "verify_hr_emails",
-    result: "careers@acme.com — MX ok, found on acme.com/careers",
+    name: "parse_naukri_requirements",
+    result: "Job requires Postgres and React. Your resume matches 100%.",
   },
   {
     kind: "assistant",
-    text: "Here's the draft. It leads with the Postgres work from your last role, since their posting calls out query performance:\n\n“Hi — I'm applying for the Backend Engineer role…”\n\nSend it?",
+    text: "Here's the draft. It highlights your Postgres work based on the Naukri posting, and it's personally addressed to Jane from LinkedIn:\n\n“Hi Jane — I'm applying for the Backend Engineer role…”\n\nSend it?",
   },
-  { kind: "user", text: "yes, send" },
+  { kind: "user", text: "yes, send via Setu" },
   {
     kind: "tool",
-    name: "send_application",
-    result: "sent · message_id 18f2a9c4d5e6b7a8",
+    name: "setu_send_application",
+    result: "sent — message_id 18f2a9c4d5e6b7a8",
   },
   {
     kind: "sent",
-    text: "Sent from your Gmail. It's in your Sent folder, and their reply lands in your inbox.",
+    text: "Setu delivered this securely through your Gmail. Replies go straight to your inbox.",
   },
 ];
 

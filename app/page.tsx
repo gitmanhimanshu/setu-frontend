@@ -82,10 +82,10 @@ const steps = [
   { n: 1, title: "Add the URL", body: "One connector URL into Claude, ChatGPT, or any MCP client. Nothing to install." },
   { n: 2, title: "Sign in with Google", body: "Grant one permission — send email. That's the whole auth step." },
   { n: 3, title: "Save your resume link", body: "Setu checks it's publicly openable, then appends it to every application." },
-  { n: 4, title: "Ask in plain language", body: "\u201CFind fintech startups hiring backend engineers and apply.\u201D Your assistant does the research." },
-  { n: 5, title: "Read the drafts", body: "Every recipient and a full draft, before anything leaves. You approve." },
-  { n: 6, title: "Sent as you", body: "Setu delivers through Gmail, paced and logged. Replies go straight to you." },
-  { n: 7, title: "Know when to follow up", body: "Setu tracks who opens your link. Five opens this afternoon means follow up today; nothing after five days means the address was wrong, not you." },
+  { n: 4, title: "Extract with LLM", body: "Provide links to LinkedIn or Naukri. Your assistant extracts recruiter emails and job requirements." },
+  { n: 5, title: "Read the drafts", body: "Every recipient and a highly-personalized draft are shown before anything leaves. You approve." },
+  { n: 6, title: "Sent as you via Setu", body: "Setu securely delivers the email through your own Gmail. Replies go straight to your inbox." },
+  { n: 7, title: "Know when to follow up", body: "Setu tracks who opens your link. Five opens this afternoon means follow up today." },
 ];
 
 const terminalLines = [
