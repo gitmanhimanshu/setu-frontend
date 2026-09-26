@@ -171,10 +171,6 @@ export default function Home() {
                 Open Source
               </a>
             </div>
-
-            <p className="mt-6 text-sm text-[var(--text-muted)]">
-              Start with <span className="font-medium text-[var(--text-primary)]">5 free emails</span>. No install — it&apos;s a URL.
-            </p>
           </div>
 
           <Reveal delay={0.1}>
