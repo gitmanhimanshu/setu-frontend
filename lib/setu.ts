@@ -47,7 +47,23 @@ export type Stats = {
   daily_limit: number | null;
   companies: number;
   company_opens: CompanyOpenStat[];
+  company_opens_total?: number;
+  company_opens_page?: number;
+  company_opens_limit?: number;
+  company_opens_total_pages?: number;
   recent: Send[];
+  recent_total?: number;
+  recent_page?: number;
+  recent_limit?: number;
+  recent_total_pages?: number;
+};
+
+export type PaginatedResponse<T> = {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
 };
 
 export type LinksResponse = {
@@ -76,6 +92,30 @@ export async function fetchStats(accessToken: string): Promise<Stats> {
     cache: "no-store",
   });
   return parseResponse<Stats>(res);
+}
+
+export async function fetchSends(
+  accessToken: string,
+  page = 1,
+  limit = 20
+): Promise<PaginatedResponse<Send>> {
+  const res = await fetch(`${SETU_URL}/api/sends?page=${page}&limit=${limit}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    cache: "no-store",
+  });
+  return parseResponse<PaginatedResponse<Send>>(res);
+}
+
+export async function fetchCompanyOpens(
+  accessToken: string,
+  page = 1,
+  limit = 20
+): Promise<PaginatedResponse<CompanyOpenStat>> {
+  const res = await fetch(`${SETU_URL}/api/company_opens?page=${page}&limit=${limit}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    cache: "no-store",
+  });
+  return parseResponse<PaginatedResponse<CompanyOpenStat>>(res);
 }
 
 export async function saveLink(

@@ -5,10 +5,13 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ArrowRight,
   BadgeCheck,
+  ChevronLeft,
+  ChevronRight,
   Eye,
   EyeOff,
   ExternalLink,
   FileText,
+  Loader2,
   LogOut,
   Mail,
   Pencil,
@@ -25,12 +28,15 @@ import { MCP_URL } from "@/lib/site";
 import {
   type CompanyOpenStat,
   deleteLink,
+  fetchCompanyOpens,
+  fetchSends,
   fetchStats,
   formatOpenCount,
   formatWhen,
   saveLink,
   setDefaultLink,
   type SavedLink,
+  type Send,
   type Stats,
 } from "@/lib/setu";
 import { requestAccessToken } from "@/lib/google";
@@ -272,8 +278,8 @@ function Panel({
                 </div>
               </div>
 
-              <CompanyOpens stats={stats} />
-              <RecentSends stats={stats} />
+              <CompanyOpens stats={stats} token={token} />
+              <RecentSends stats={stats} token={token} />
             </>
           )}
         </div>
@@ -580,10 +586,41 @@ function LinksCard({
   );
 }
 
-function RecentSends({ stats }: { stats: Stats }) {
-  const recent = stats.recent ?? [];
+function RecentSends({ stats, token }: { stats: Stats; token: string }) {
+  const [items, setItems] = useState<Send[]>(stats.recent ?? []);
+  const [page, setPage] = useState(stats.recent_page ?? 1);
+  const [total, setTotal] = useState(stats.recent_total ?? stats.total_sent ?? (stats.recent?.length ?? 0));
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setItems(stats.recent ?? []);
+    setPage(stats.recent_page ?? 1);
+    setTotal(stats.recent_total ?? stats.total_sent ?? (stats.recent?.length ?? 0));
+  }, [stats.recent, stats.recent_page, stats.recent_total, stats.total_sent]);
+
+  const recent = items;
+  if (recent.length === 0 && total === 0) return null;
+
   const totalOpens = recent.reduce((sum, s) => sum + (s.open_count || 0), 0);
   const openedCount = recent.filter((s) => s.open_count > 0).length;
+
+  const limit = 20;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+
+  async function goToPage(p: number) {
+    if (p < 1 || p > totalPages || p === page || loading) return;
+    setLoading(true);
+    try {
+      const res = await fetchSends(token, p, limit);
+      setItems(res.items);
+      setTotal(res.total);
+      setPage(res.page);
+    } catch (err) {
+      console.error("Failed to load sends page", err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <section className="mt-10">
@@ -622,9 +659,12 @@ function RecentSends({ stats }: { stats: Stats }) {
         </p>
       </div>
 
-      <h3 className="mt-6 text-lg sm:text-xl font-semibold tracking-tight">Recent sends</h3>
+      <div className="mt-6 flex items-center justify-between gap-4">
+        <h3 className="text-lg sm:text-xl font-semibold tracking-tight">Recent sends</h3>
+        {loading && <Loader2 size={16} className="animate-spin text-[var(--text-muted)]" />}
+      </div>
 
-      <ul className="mt-4 sm:hidden space-y-3">
+      <ul className={`mt-4 sm:hidden space-y-3 ${loading ? "opacity-60 pointer-events-none" : ""}`}>
         {recent.map((send, i) => (
           <li key={i} className="rounded-xl border border-line bg-surface p-4">
             <div className="flex items-start justify-between gap-3">
@@ -651,7 +691,7 @@ function RecentSends({ stats }: { stats: Stats }) {
         ))}
       </ul>
 
-      <div className="mt-4 hidden sm:block scroll-x rounded-xl border border-line">
+      <div className={`mt-4 hidden sm:block scroll-x rounded-xl border border-line ${loading ? "opacity-60 pointer-events-none" : ""}`}>
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="bg-[var(--surface-2)]">
@@ -693,23 +733,85 @@ function RecentSends({ stats }: { stats: Stats }) {
           </tbody>
         </table>
       </div>
+
+      {total > limit && (
+        <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-[var(--text-secondary)]">
+          <p className="text-xs text-[var(--text-muted)]">
+            Showing <span className="font-medium text-[var(--text-primary)]">{(page - 1) * limit + 1}</span>–<span className="font-medium text-[var(--text-primary)]">{Math.min(page * limit, total)}</span> of{" "}
+            <span className="font-medium text-[var(--text-primary)]">{total}</span> sends
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => goToPage(page - 1)}
+              disabled={page <= 1 || loading}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-xs font-medium hover:bg-[var(--surface-2)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft size={14} />
+              Previous
+            </button>
+            <span className="text-xs px-2 font-medium tabular">
+              {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => goToPage(page + 1)}
+              disabled={page >= totalPages || loading}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-xs font-medium hover:bg-[var(--surface-2)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
 
-function CompanyOpens({ stats }: { stats: Stats }) {
-  const rows = stats.company_opens ?? [];
+function CompanyOpens({ stats, token }: { stats: Stats; token: string }) {
+  const [rows, setRows] = useState<CompanyOpenStat[]>(stats.company_opens ?? []);
+  const [page, setPage] = useState(stats.company_opens_page ?? 1);
+  const [total, setTotal] = useState(stats.company_opens_total ?? (stats.company_opens?.length ?? 0));
+  const [loading, setLoading] = useState(false);
 
-  if (rows.length === 0) return null;
+  useEffect(() => {
+    setRows(stats.company_opens ?? []);
+    setPage(stats.company_opens_page ?? 1);
+    setTotal(stats.company_opens_total ?? (stats.company_opens?.length ?? 0));
+  }, [stats.company_opens, stats.company_opens_page, stats.company_opens_total]);
+
+  if ((stats.company_opens ?? []).length === 0 && rows.length === 0) return null;
+
+  const limit = 20;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+
+  async function goToPage(p: number) {
+    if (p < 1 || p > totalPages || p === page || loading) return;
+    setLoading(true);
+    try {
+      const res = await fetchCompanyOpens(token, p, limit);
+      setRows(res.items);
+      setTotal(res.total);
+      setPage(res.page);
+    } catch (err) {
+      console.error("Failed to load company opens page", err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <section className="mt-10">
-      <h2 className="text-lg sm:text-xl font-semibold tracking-tight">Company opens</h2>
-      <p className="mt-2 text-sm text-ink-2">
-        Which companies opened your attached link, and how many times.
-      </p>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg sm:text-xl font-semibold tracking-tight">Company opens</h2>
+          <p className="mt-1 text-sm text-ink-2">
+            Which companies opened your attached link, and how many times.
+          </p>
+        </div>
+        {loading && <Loader2 size={16} className="animate-spin text-[var(--text-muted)]" />}
+      </div>
 
-      <div className="mt-4 scroll-x rounded-xl border border-line">
+      <div className={`mt-4 scroll-x rounded-xl border border-line ${loading ? "opacity-60 pointer-events-none" : ""}`}>
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="bg-[var(--surface-2)]">
@@ -721,7 +823,7 @@ function CompanyOpens({ stats }: { stats: Stats }) {
           </thead>
           <tbody>
             {rows.map((row: CompanyOpenStat) => (
-              <tr key={row.company} className="border-b border-line last:border-0">
+              <tr key={row.company} className="border-b border-line last:border-0 hover:bg-[var(--surface-2)]/50 transition-colors">
                 <td className="px-4 py-3 align-top font-medium">{row.company}</td>
                 <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
                   {row.total_opens}
@@ -737,6 +839,36 @@ function CompanyOpens({ stats }: { stats: Stats }) {
           </tbody>
         </table>
       </div>
+
+      {total > limit && (
+        <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-[var(--text-secondary)]">
+          <p className="text-xs text-[var(--text-muted)]">
+            Showing <span className="font-medium text-[var(--text-primary)]">{(page - 1) * limit + 1}</span>–<span className="font-medium text-[var(--text-primary)]">{Math.min(page * limit, total)}</span> of{" "}
+            <span className="font-medium text-[var(--text-primary)]">{total}</span> companies
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => goToPage(page - 1)}
+              disabled={page <= 1 || loading}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-xs font-medium hover:bg-[var(--surface-2)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft size={14} />
+              Previous
+            </button>
+            <span className="text-xs px-2 font-medium tabular">
+              {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => goToPage(page + 1)}
+              disabled={page >= totalPages || loading}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-xs font-medium hover:bg-[var(--surface-2)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
