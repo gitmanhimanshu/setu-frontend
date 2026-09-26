@@ -99,11 +99,37 @@ export async function fetchSends(
   page = 1,
   limit = 20
 ): Promise<PaginatedResponse<Send>> {
-  const res = await fetch(`${SETU_URL}/api/sends?page=${page}&limit=${limit}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-    cache: "no-store",
-  });
-  return parseResponse<PaginatedResponse<Send>>(res);
+  try {
+    const res = await fetch(`${SETU_URL}/api/sends?page=${page}&limit=${limit}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+    if (res.ok) {
+      return await parseResponse<PaginatedResponse<Send>>(res);
+    }
+  } catch (err) {
+    console.warn("Direct /api/sends call failed, trying /api/stats fallback", err);
+  }
+
+  const res = await fetch(
+    `${SETU_URL}/api/stats?sends_page=${page}&sends_limit=${limit}`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    }
+  );
+  const data = await parseResponse<Stats>(res);
+  const items = data.recent ?? [];
+  const total = data.recent_total ?? data.total_sent ?? items.length;
+  const total_pages =
+    data.recent_total_pages ?? Math.max(1, Math.ceil(total / limit));
+  return {
+    items,
+    total,
+    page,
+    limit,
+    total_pages,
+  };
 }
 
 export async function fetchCompanyOpens(
@@ -111,11 +137,40 @@ export async function fetchCompanyOpens(
   page = 1,
   limit = 20
 ): Promise<PaginatedResponse<CompanyOpenStat>> {
-  const res = await fetch(`${SETU_URL}/api/company_opens?page=${page}&limit=${limit}`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-    cache: "no-store",
-  });
-  return parseResponse<PaginatedResponse<CompanyOpenStat>>(res);
+  try {
+    const res = await fetch(
+      `${SETU_URL}/api/company_opens?page=${page}&limit=${limit}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        cache: "no-store",
+      }
+    );
+    if (res.ok) {
+      return await parseResponse<PaginatedResponse<CompanyOpenStat>>(res);
+    }
+  } catch (err) {
+    console.warn("Direct /api/company_opens call failed, trying /api/stats fallback", err);
+  }
+
+  const res = await fetch(
+    `${SETU_URL}/api/stats?company_page=${page}&company_limit=${limit}`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    }
+  );
+  const data = await parseResponse<Stats>(res);
+  const items = data.company_opens ?? [];
+  const total = data.company_opens_total ?? items.length;
+  const total_pages =
+    data.company_opens_total_pages ?? Math.max(1, Math.ceil(total / limit));
+  return {
+    items,
+    total,
+    page,
+    limit,
+    total_pages,
+  };
 }
 
 export async function saveLink(

@@ -601,8 +601,9 @@ function RecentSends({ stats, token }: { stats: Stats; token: string }) {
   const recent = items;
   if (recent.length === 0 && total === 0) return null;
 
-  const totalOpens = recent.reduce((sum, s) => sum + (s.open_count || 0), 0);
-  const openedCount = recent.filter((s) => s.open_count > 0).length;
+  const seenCount = recent.filter((s) => (s.open_count || 0) > 0).length;
+  const unseenCount = Math.max(0, recent.length - seenCount);
+  const pageOpens = recent.reduce((sum, s) => sum + (s.open_count || 0), 0);
 
   const limit = 20;
   const totalPages = Math.max(1, Math.ceil(total / limit));
@@ -639,19 +640,30 @@ function RecentSends({ stats, token }: { stats: Stats; token: string }) {
               </p>
             </div>
           </div>
-          <div className="sm:ml-auto flex items-center gap-4 text-sm">
+          <div className="sm:ml-auto flex items-center gap-3 sm:gap-4 text-sm flex-wrap">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] font-medium tabular">
+              <span
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--accent)]/10 text-[var(--accent)] font-medium tabular"
+                title={`${pageOpens} total link open${pageOpens === 1 ? "" : "s"} across ${seenCount} email${seenCount === 1 ? "" : "s"} on this page`}
+              >
                 <Eye size={13} />
-                {totalOpens} opens
+                {seenCount} seen
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--good)]/10 text-[var(--good-text)] font-medium tabular">
+              <span
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--good)]/10 text-[var(--good-text)] font-medium tabular"
+                title={`${unseenCount} unopened email${unseenCount === 1 ? "" : "s"} on this page`}
+              >
                 <EyeOff size={13} />
-                {recent.length - openedCount} unseen
+                {unseenCount} unseen
               </span>
             </div>
+            {totalPages > 1 && (
+              <span className="text-xs text-[var(--text-muted)] font-medium">
+                (Page {page})
+              </span>
+            )}
           </div>
         </div>
         <p className="relative mt-3 text-xs text-[var(--text-muted)] leading-relaxed max-w-2xl">
