@@ -227,11 +227,31 @@ function Panel({
               />
 
               <div className="mt-8 grid sm:grid-cols-2 gap-4">
-                <Meter
-                  label="Today's quota"
-                  used={stats.sent_last_24h ?? 0}
-                  total={stats.daily_limit ?? 80}
-                />
+                {stats.plan === "pro" ? (
+                  <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 flex flex-col justify-between">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <p className="text-sm text-[var(--text-secondary)]">Today&apos;s quota</p>
+                      <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                        Unlimited
+                      </span>
+                    </div>
+                    <div className="mt-3">
+                      <p className="text-3xl font-semibold tracking-tight">
+                        {(stats.sent_last_24h ?? 0).toLocaleString()}
+                        <span className="text-sm font-normal text-[var(--text-muted)] ml-2">sent today</span>
+                      </p>
+                    </div>
+                    <p className="mt-2 text-xs text-[var(--text-muted)]">
+                      Pro plan has no daily sending limit
+                    </p>
+                  </div>
+                ) : (
+                  <Meter
+                    label="Today's quota"
+                    used={stats.sent_last_24h ?? 0}
+                    total={stats.daily_limit ?? 80}
+                  />
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <StatTile
                     label="Resume opens"
@@ -240,13 +260,13 @@ function Panel({
                   />
                   <StatTile
                     label={stats.plan === "pro" ? "Plan" : "Free left"}
-                    value={stats.plan === "pro" ? "Pro" : `${stats.free_remaining ?? 0}`}
+                    value={stats.plan === "pro" ? "Pro" : `${stats.free_remaining ?? Math.max(0, (stats.daily_limit ?? 80) - (stats.sent_last_24h ?? 0))}`}
                     note={
                       stats.plan === "pro" && stats.subscription_ends_at
                         ? `renews ${new Date(stats.subscription_ends_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
                         : stats.plan === "pro"
-                          ? undefined
-                          : `of ${stats.free_email_limit} lifetime`
+                          ? "Unlimited sends"
+                          : `of ${stats.free_email_limit ?? 80} today`
                     }
                   />
                 </div>
@@ -316,7 +336,9 @@ function AccountCard({ stats }: { stats: Stats }) {
         </div>
         <div className="flex items-center justify-between gap-3">
           <dt className="text-ink-2">Daily limit</dt>
-          <dd className="font-medium tabular">{stats.daily_limit} / day</dd>
+          <dd className="font-medium tabular">
+            {stats.plan === "pro" ? "Unlimited" : `${stats.daily_limit ?? 80} / day`}
+          </dd>
         </div>
       </dl>
     </section>

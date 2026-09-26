@@ -37,14 +37,14 @@ export type Stats = {
   plan: string;
   subscribed_at: string | null;
   subscription_ends_at: string | null;
-  free_email_limit: number;
+  free_email_limit: number | null;
   free_remaining: number | null;
   total_sent: number;
   total_failed: number;
   total_opens: number;
   opened_sends: number;
   sent_last_24h: number;
-  daily_limit: number;
+  daily_limit: number | null;
   companies: number;
   company_opens: CompanyOpenStat[];
   recent: Send[];
