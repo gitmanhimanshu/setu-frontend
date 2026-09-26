@@ -42,7 +42,7 @@ export default function SetuNav() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
-          {["Features", "How It Works", "Pricing", "Resources", "About"].map((item) => (
+          {["Features", "How It Works", "Resources", "About"].map((item) => (
             <Link
               key={item}
               href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
