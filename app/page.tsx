@@ -24,6 +24,8 @@ import { AnimatedTerminal } from "@/components/CodeWindow";
 import Faq from "@/components/Faq";
 import Reveal from "@/components/Reveal";
 import SignalPreview from "@/components/SignalPreview";
+import ContextFirewallAnnouncement from "@/components/ContextFirewallAnnouncement";
+import ContextFirewallFloatingCard from "@/components/ContextFirewallFloatingCard";
 import { CLIENTS, LIMITS, MCP_URL, TAGLINE, GITHUB_URL } from "@/lib/site";
 
 const features = [
@@ -107,7 +109,13 @@ export default function Home() {
       {/* Hero */}
       <section className="relative isolate">
         <Aurora />
-        <div className="mx-auto max-w-6xl px-6 pt-20 pb-16 sm:pt-28 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+        {/* Context Firewall Teaser Announcement */}
+        <div className="mx-auto max-w-6xl px-6 pt-6 sm:pt-8">
+          <ContextFirewallAnnouncement />
+        </div>
+
+        <div className="mx-auto max-w-6xl px-6 pt-6 pb-16 sm:pt-10 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div>
             <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)]">
               <Sparkles size={12} className="text-[var(--accent)]" />
@@ -545,6 +553,9 @@ export default function Home() {
           </div>
         </Reveal>
       </section>
+
+      {/* Context Firewall Floating Teaser Card */}
+      <ContextFirewallFloatingCard />
     </main>
   );
 }
