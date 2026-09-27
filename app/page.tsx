@@ -111,11 +111,11 @@ export default function Home() {
         <Aurora />
 
         {/* Context Firewall Teaser Announcement */}
-        <div className="mx-auto max-w-6xl px-6 pt-6 sm:pt-8">
+        <div className="mx-auto max-w-6xl px-6 pt-3 sm:pt-5">
           <ContextFirewallAnnouncement />
         </div>
 
-        <div className="mx-auto max-w-6xl px-6 pt-6 pb-16 sm:pt-10 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="mx-auto max-w-6xl px-6 pt-3 pb-16 sm:pt-5 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div>
             <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)]">
               <Sparkles size={12} className="text-[var(--accent)]" />

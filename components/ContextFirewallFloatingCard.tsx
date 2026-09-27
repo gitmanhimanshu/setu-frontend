@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Shield, ArrowRight, X, Sparkles } from "lucide-react";
+import { SETU_URL } from "@/lib/site";
 
 const STORAGE_KEY = "setu_cf_teaser_dismissed";
 
@@ -30,6 +31,29 @@ export default function ContextFirewallFloatingCard() {
       // Ignore if localStorage unavailable
     }
     setDismissed(true);
+  };
+
+  const trackClick = () => {
+    try {
+      fetch(`${SETU_URL}/api/visit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "context_firewall_click",
+          source: "floating_card",
+          path: `${window.location.pathname}?action=click_cf_floating_card`,
+        }),
+        keepalive: true,
+      }).catch(() => {});
+
+      if (typeof window !== "undefined" && (window as any).gtag) {
+        (window as any).gtag("event", "context_firewall_click", {
+          event_category: "announcement",
+          event_label: "floating_card",
+          destination: "https://context-firewall.vercel.app/",
+        });
+      }
+    } catch {}
   };
 
   return (
@@ -90,6 +114,7 @@ export default function ContextFirewallFloatingCard() {
                 href="https://context-firewall.vercel.app/"
                 target="_blank"
                 rel="noreferrer noopener"
+                onClick={trackClick}
                 className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 text-xs font-semibold text-white tracking-wide shadow-sm hover:shadow-cyan-500/30 transition-all duration-200 border border-cyan-400/30 hover:scale-[1.02] active:scale-95"
               >
                 <span>Explore</span>
