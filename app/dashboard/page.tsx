@@ -591,6 +591,7 @@ function RecentSends({ stats, token }: { stats: Stats; token: string }) {
   const [page, setPage] = useState(stats.recent_page ?? 1);
   const [total, setTotal] = useState(stats.recent_total ?? stats.total_sent ?? (stats.recent?.length ?? 0));
   const [loading, setLoading] = useState(false);
+  const [sort, setSort] = useState<"recent" | "opened">("recent");
 
   useEffect(() => {
     setItems(stats.recent ?? []);
@@ -608,11 +609,27 @@ function RecentSends({ stats, token }: { stats: Stats; token: string }) {
   const limit = 20;
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
+  async function handleSort(newSort: "recent" | "opened") {
+    if (loading) return;
+    setSort(newSort);
+    setLoading(true);
+    try {
+      const res = await fetchSends(token, 1, limit, newSort);
+      setItems(res.items);
+      setTotal(res.total);
+      setPage(1);
+    } catch (err) {
+      console.error("Failed to load sends", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function goToPage(p: number) {
     if (p < 1 || p > totalPages || p === page || loading) return;
     setLoading(true);
     try {
-      const res = await fetchSends(token, p, limit);
+      const res = await fetchSends(token, p, limit, sort);
       setItems(res.items);
       setTotal(res.total);
       setPage(res.page);
@@ -671,9 +688,25 @@ function RecentSends({ stats, token }: { stats: Stats; token: string }) {
         </p>
       </div>
 
-      <div className="mt-6 flex items-center justify-between gap-4">
+      <div className="mt-6 flex items-center justify-between gap-4 flex-wrap">
         <h3 className="text-lg sm:text-xl font-semibold tracking-tight">Recent sends</h3>
-        {loading && <Loader2 size={16} className="animate-spin text-[var(--text-muted)]" />}
+        <div className="flex items-center gap-2">
+          <div className="inline-flex rounded-lg border border-[var(--border)] p-0.5 bg-[var(--surface-2)] text-xs font-medium">
+            <button
+              onClick={() => handleSort("recent")}
+              className={`px-2.5 py-1 rounded-md transition-colors ${sort === "recent" ? "bg-[var(--surface)] text-[var(--text-primary)] shadow-sm font-semibold" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"}`}
+            >
+              Latest sent
+            </button>
+            <button
+              onClick={() => handleSort("opened")}
+              className={`px-2.5 py-1 rounded-md transition-colors ${sort === "opened" ? "bg-[var(--surface)] text-[var(--text-primary)] shadow-sm font-semibold" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"}`}
+            >
+              Latest viewed
+            </button>
+          </div>
+          {loading && <Loader2 size={16} className="animate-spin text-[var(--text-muted)]" />}
+        </div>
       </div>
 
       <ul className={`mt-4 sm:hidden space-y-3 ${loading ? "opacity-60 pointer-events-none" : ""}`}>
@@ -784,6 +817,7 @@ function CompanyOpens({ stats, token }: { stats: Stats; token: string }) {
   const [page, setPage] = useState(stats.company_opens_page ?? 1);
   const [total, setTotal] = useState(stats.company_opens_total ?? (stats.company_opens?.length ?? 0));
   const [loading, setLoading] = useState(false);
+  const [sort, setSort] = useState<"latest" | "opens">("latest");
 
   useEffect(() => {
     setRows(stats.company_opens ?? []);
@@ -796,11 +830,27 @@ function CompanyOpens({ stats, token }: { stats: Stats; token: string }) {
   const limit = 20;
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
+  async function handleSort(newSort: "latest" | "opens") {
+    if (loading) return;
+    setSort(newSort);
+    setLoading(true);
+    try {
+      const res = await fetchCompanyOpens(token, 1, limit, newSort);
+      setRows(res.items);
+      setTotal(res.total);
+      setPage(1);
+    } catch (err) {
+      console.error("Failed to load company opens", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function goToPage(p: number) {
     if (p < 1 || p > totalPages || p === page || loading) return;
     setLoading(true);
     try {
-      const res = await fetchCompanyOpens(token, p, limit);
+      const res = await fetchCompanyOpens(token, p, limit, sort);
       setRows(res.items);
       setTotal(res.total);
       setPage(res.page);
@@ -813,14 +863,30 @@ function CompanyOpens({ stats, token }: { stats: Stats; token: string }) {
 
   return (
     <section className="mt-10">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-lg sm:text-xl font-semibold tracking-tight">Company opens</h2>
           <p className="mt-1 text-sm text-ink-2">
-            Which companies opened your attached link, and how many times.
+            Which companies opened your attached link, sorted by latest view.
           </p>
         </div>
-        {loading && <Loader2 size={16} className="animate-spin text-[var(--text-muted)]" />}
+        <div className="flex items-center gap-2">
+          <div className="inline-flex rounded-lg border border-[var(--border)] p-0.5 bg-[var(--surface-2)] text-xs font-medium">
+            <button
+              onClick={() => handleSort("latest")}
+              className={`px-2.5 py-1 rounded-md transition-colors ${sort === "latest" ? "bg-[var(--surface)] text-[var(--text-primary)] shadow-sm font-semibold" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"}`}
+            >
+              Latest view
+            </button>
+            <button
+              onClick={() => handleSort("opens")}
+              className={`px-2.5 py-1 rounded-md transition-colors ${sort === "opens" ? "bg-[var(--surface)] text-[var(--text-primary)] shadow-sm font-semibold" : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"}`}
+            >
+              Most opens
+            </button>
+          </div>
+          {loading && <Loader2 size={16} className="animate-spin text-[var(--text-muted)]" />}
+        </div>
       </div>
 
       <div className={`mt-4 scroll-x rounded-xl border border-line ${loading ? "opacity-60 pointer-events-none" : ""}`}>
@@ -828,9 +894,23 @@ function CompanyOpens({ stats, token }: { stats: Stats; token: string }) {
           <thead>
             <tr className="bg-[var(--surface-2)]">
               <Th>Company</Th>
-              <Th>Total opens</Th>
+              <th className="px-4 py-2.5 text-left text-xs font-semibold text-ink-2">
+                <button
+                  onClick={() => handleSort("opens")}
+                  className="inline-flex items-center gap-1 hover:text-[var(--text-primary)] transition-colors"
+                >
+                  Total opens {sort === "opens" && "↓"}
+                </button>
+              </th>
               <Th>Opened sends</Th>
-              <Th>Last open</Th>
+              <th className="px-4 py-2.5 text-left text-xs font-semibold text-ink-2">
+                <button
+                  onClick={() => handleSort("latest")}
+                  className="inline-flex items-center gap-1 hover:text-[var(--text-primary)] transition-colors"
+                >
+                  Last open {sort === "latest" && "↓"}
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>

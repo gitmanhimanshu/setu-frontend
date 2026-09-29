@@ -97,10 +97,11 @@ export async function fetchStats(accessToken: string): Promise<Stats> {
 export async function fetchSends(
   accessToken: string,
   page = 1,
-  limit = 20
+  limit = 20,
+  sort = "recent"
 ): Promise<PaginatedResponse<Send>> {
   try {
-    const res = await fetch(`${SETU_URL}/api/sends?page=${page}&limit=${limit}`, {
+    const res = await fetch(`${SETU_URL}/api/sends?page=${page}&limit=${limit}&sort=${sort}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
     });
@@ -112,7 +113,7 @@ export async function fetchSends(
   }
 
   const res = await fetch(
-    `${SETU_URL}/api/stats?sends_page=${page}&sends_limit=${limit}`,
+    `${SETU_URL}/api/stats?sends_page=${page}&sends_limit=${limit}&sends_sort=${sort}`,
     {
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
@@ -135,11 +136,12 @@ export async function fetchSends(
 export async function fetchCompanyOpens(
   accessToken: string,
   page = 1,
-  limit = 20
+  limit = 20,
+  sort = "latest"
 ): Promise<PaginatedResponse<CompanyOpenStat>> {
   try {
     const res = await fetch(
-      `${SETU_URL}/api/company_opens?page=${page}&limit=${limit}`,
+      `${SETU_URL}/api/company_opens?page=${page}&limit=${limit}&sort=${sort}`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
         cache: "no-store",
@@ -153,7 +155,7 @@ export async function fetchCompanyOpens(
   }
 
   const res = await fetch(
-    `${SETU_URL}/api/stats?company_page=${page}&company_limit=${limit}`,
+    `${SETU_URL}/api/stats?company_page=${page}&company_limit=${limit}&company_sort=${sort}`,
     {
       headers: { Authorization: `Bearer ${accessToken}` },
       cache: "no-store",
