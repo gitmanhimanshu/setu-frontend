@@ -15,6 +15,7 @@ import {
   LogOut,
   Mail,
   Pencil,
+  Plus,
   RefreshCw,
   Sparkles,
   Star,
@@ -35,6 +36,7 @@ import {
   formatWhen,
   saveLink,
   setDefaultLink,
+  updateProfileMetadata,
   type SavedLink,
   type Send,
   type Stats,
@@ -285,7 +287,7 @@ function Panel({
         </div>
 
         <aside className="space-y-4 lg:sticky lg:top-24 min-w-0">
-          <AccountCard stats={stats} />
+          <AccountCard stats={stats} token={token} onSaved={load} />
           <LinksCard stats={stats} token={token} onSaved={load} />
           <FilesCard token={token} onExpired={onSignOut} />
         </aside>
@@ -294,84 +296,387 @@ function Panel({
   );
 }
 
-function AccountCard({ stats }: { stats: Stats }) {
+function AccountCard({
+  stats,
+  token,
+  onSaved,
+}: {
+  stats: Stats;
+  token: string;
+  onSaved: () => void;
+}) {
   const initial = (stats.name ?? stats.email ?? "?").trim().charAt(0).toUpperCase();
+  const [editing, setEditing] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successNote, setSuccessNote] = useState<string | null>(null);
+
+  const [city, setCity] = useState(stats.metadata?.city ?? "");
+  const [expectedCtc, setExpectedCtc] = useState(stats.metadata?.expected_ctc ?? "");
+  const [currentCtc, setCurrentCtc] = useState(stats.metadata?.current_ctc ?? "");
+  const [noticePeriod, setNoticePeriod] = useState(stats.metadata?.notice_period ?? "");
+  const [experience, setExperience] = useState(stats.metadata?.experience ?? "");
+  const [customFields, setCustomFields] = useState<Array<{ key: string; value: string }>>([]);
+
+  const standardKeys = new Set(["city", "expected_ctc", "current_ctc", "notice_period", "experience"]);
+
+  function startEditing() {
+    setCity(stats.metadata?.city ?? "");
+    setExpectedCtc(stats.metadata?.expected_ctc ?? "");
+    setCurrentCtc(stats.metadata?.current_ctc ?? "");
+    setNoticePeriod(stats.metadata?.notice_period ?? "");
+    setExperience(stats.metadata?.experience ?? "");
+
+    const extras = Object.entries(stats.metadata || {})
+      .filter(([k]) => !standardKeys.has(k))
+      .map(([key, value]) => ({ key, value: String(value ?? "") }));
+    setCustomFields(extras);
+    setError(null);
+    setSuccessNote(null);
+    setEditing(true);
+  }
+
+  function addCustomField() {
+    setCustomFields((prev) => [...prev, { key: "", value: "" }]);
+  }
+
+  function removeCustomField(idx: number) {
+    setCustomFields((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  function updateCustomField(idx: number, field: "key" | "value", val: string) {
+    setCustomFields((prev) => {
+      const next = [...prev];
+      next[idx] = { ...next[idx], [field]: val };
+      return next;
+    });
+  }
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    setSuccessNote(null);
+
+    const payload: Record<string, string> = {};
+    if (city.trim()) payload.city = city.trim();
+    if (expectedCtc.trim()) payload.expected_ctc = expectedCtc.trim();
+    if (currentCtc.trim()) payload.current_ctc = currentCtc.trim();
+    if (noticePeriod.trim()) payload.notice_period = noticePeriod.trim();
+    if (experience.trim()) payload.experience = experience.trim();
+
+    for (const item of customFields) {
+      const k = item.key.trim().toLowerCase().replace(/\s+/g, "_");
+      if (k && item.value.trim()) {
+        payload[k] = item.value.trim();
+      }
+    }
+
+    try {
+      await updateProfileMetadata(token, payload);
+      setSuccessNote("Profile info updated successfully.");
+      setEditing(false);
+      onSaved();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update profile info.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <section className="rounded-xl border border-line bg-surface p-5">
-      <div className="flex items-center gap-3">
-        <div
-          className="shrink-0 grid place-items-center w-11 h-11 rounded-full text-lg font-semibold text-white"
-          style={{ background: "var(--accent)" }}
-          aria-hidden="true"
-        >
-          {initial}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div
+            className="shrink-0 grid place-items-center w-11 h-11 rounded-full text-lg font-semibold text-white"
+            style={{ background: "var(--accent)" }}
+            aria-hidden="true"
+          >
+            {initial}
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-sm truncate text-[var(--text-primary)]">{stats.name ?? stats.email}</p>
+            <p className="text-xs text-[var(--text-muted)] truncate flex items-center gap-1.5">
+              <Mail size={11} className="shrink-0" />
+              {stats.email}
+            </p>
+          </div>
         </div>
-        <div className="min-w-0">
-          <p className="font-semibold truncate">{stats.name ?? stats.email}</p>
-          <p className="text-xs text-ink-3 truncate flex items-center gap-1.5">
-            <Mail size={11} className="shrink-0" />
-            {stats.email}
-          </p>
-        </div>
+        {!editing && (
+          <button
+            onClick={startEditing}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)] border border-[var(--border)] transition-colors shrink-0"
+            title="Edit profile info"
+          >
+            <Pencil size={11} />
+            Edit info
+          </button>
+        )}
       </div>
 
-      <dl className="mt-4 space-y-2.5 text-sm">
-        <div className="flex items-center justify-between gap-3">
-          <dt className="text-ink-2">Role</dt>
-          <dd className="font-medium">{stats.role_label ?? "Not set yet"}</dd>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          <dt className="text-ink-2">Plan</dt>
-          <dd className="inline-flex items-center gap-1.5 font-medium">
-            {stats.plan === "pro" ? (
-              <>
-                <Sparkles size={13} style={{ color: "var(--accent)" }} aria-hidden="true" />
-                Pro
-              </>
-            ) : (
-              <>
-                <BadgeCheck size={13} className="text-ink-3" aria-hidden="true" />
-                Free
-              </>
-            )}
-          </dd>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          <dt className="text-ink-2">Default link</dt>
-          <dd className="font-medium">{stats.default_link_name ?? "None"}</dd>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          <dt className="text-ink-2">Daily limit</dt>
-          <dd className="font-medium tabular">
-            {stats.plan === "pro" ? "Unlimited" : `${stats.daily_limit ?? 80} / day`}
-          </dd>
-        </div>
-        {stats.metadata && Object.keys(stats.metadata).length > 0 && (
-          <div className="pt-2.5 mt-2.5 border-t border-line space-y-2">
-            {stats.metadata.city && (
-              <div className="flex items-center justify-between gap-3 text-xs">
-                <dt className="text-ink-2">City</dt>
-                <dd className="font-medium text-ink">{String(stats.metadata.city)}</dd>
-              </div>
-            )}
-            {stats.metadata.expected_ctc && (
-              <div className="flex items-center justify-between gap-3 text-xs">
-                <dt className="text-ink-2">Expected CTC</dt>
-                <dd className="font-medium text-ink">{String(stats.metadata.expected_ctc)}</dd>
-              </div>
-            )}
-            {Object.entries(stats.metadata)
-              .filter(([k]) => k !== "city" && k !== "expected_ctc")
-              .slice(0, 4)
-              .map(([key, val]) => (
-                <div key={key} className="flex items-center justify-between gap-3 text-xs">
-                  <dt className="text-ink-2 capitalize">{key.replace(/_/g, " ")}</dt>
-                  <dd className="font-medium truncate max-w-[150px]">{String(val)}</dd>
-                </div>
-              ))}
+      {successNote && (
+        <p className="mt-3 text-xs leading-relaxed text-[var(--good-text)]">
+          ✓ {successNote}
+        </p>
+      )}
+
+      {!editing ? (
+        <dl className="mt-4 space-y-2.5 text-sm">
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-[var(--text-secondary)]">Role</dt>
+            <dd className="font-medium text-[var(--text-primary)]">{stats.role_label ?? "Not set yet"}</dd>
           </div>
-        )}
-      </dl>
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-[var(--text-secondary)]">Plan</dt>
+            <dd className="inline-flex items-center gap-1.5 font-medium text-[var(--text-primary)]">
+              {stats.plan === "pro" ? (
+                <>
+                  <Sparkles size={13} style={{ color: "var(--accent)" }} aria-hidden="true" />
+                  Pro
+                </>
+              ) : (
+                <>
+                  <BadgeCheck size={13} className="text-[var(--text-muted)]" aria-hidden="true" />
+                  Free
+                </>
+              )}
+            </dd>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-[var(--text-secondary)]">Default resume / link</dt>
+            <dd className="font-medium text-[var(--text-primary)] truncate max-w-[170px]">
+              {stats.link ? (
+                <a
+                  href={stats.link}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-[var(--accent)] hover:underline inline-flex items-center gap-1 text-xs font-semibold"
+                >
+                  {stats.default_link_name || "View Resume"}
+                  <ExternalLink size={11} />
+                </a>
+              ) : (
+                stats.default_link_name ?? "None"
+              )}
+            </dd>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-[var(--text-secondary)]">Daily limit</dt>
+            <dd className="font-medium text-[var(--text-primary)] tabular">
+              {stats.plan === "pro" ? "Unlimited" : `${stats.daily_limit ?? 80} / day`}
+            </dd>
+          </div>
+
+          {stats.metadata && Object.keys(stats.metadata).length > 0 ? (
+            <div className="pt-2.5 mt-2.5 border-t border-[var(--border)] space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                  Profile Details
+                </span>
+              </div>
+              {stats.metadata.city && (
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <dt className="text-[var(--text-secondary)]">City</dt>
+                  <dd className="font-medium text-[var(--text-primary)]">{String(stats.metadata.city)}</dd>
+                </div>
+              )}
+              {stats.metadata.expected_ctc && (
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <dt className="text-[var(--text-secondary)]">Expected CTC</dt>
+                  <dd className="font-medium text-[var(--text-primary)]">{String(stats.metadata.expected_ctc)}</dd>
+                </div>
+              )}
+              {stats.metadata.current_ctc && (
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <dt className="text-[var(--text-secondary)]">Current CTC</dt>
+                  <dd className="font-medium text-[var(--text-primary)]">{String(stats.metadata.current_ctc)}</dd>
+                </div>
+              )}
+              {stats.metadata.notice_period && (
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <dt className="text-[var(--text-secondary)]">Notice Period</dt>
+                  <dd className="font-medium text-[var(--text-primary)]">{String(stats.metadata.notice_period)}</dd>
+                </div>
+              )}
+              {stats.metadata.experience && (
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <dt className="text-[var(--text-secondary)]">Experience</dt>
+                  <dd className="font-medium text-[var(--text-primary)]">{String(stats.metadata.experience)}</dd>
+                </div>
+              )}
+              {Object.entries(stats.metadata)
+                .filter(([k]) => !["city", "expected_ctc", "current_ctc", "notice_period", "experience"].includes(k))
+                .slice(0, 6)
+                .map(([key, val]) => (
+                  <div key={key} className="flex items-center justify-between gap-3 text-xs">
+                    <dt className="text-[var(--text-secondary)] capitalize">{key.replace(/_/g, " ")}</dt>
+                    <dd className="font-medium text-[var(--text-primary)] truncate max-w-[150px]">{String(val)}</dd>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <div className="pt-2.5 mt-2.5 border-t border-[var(--border)]">
+              <button
+                onClick={startEditing}
+                className="w-full inline-flex items-center justify-center gap-1.5 py-1 text-xs font-medium text-[var(--accent)] hover:underline"
+              >
+                <Plus size={12} />
+                Add profile info (city, expected CTC...)
+              </button>
+            </div>
+          )}
+        </dl>
+      ) : (
+        <form onSubmit={handleSave} className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3.5 space-y-3">
+          <div className="flex items-center justify-between gap-2 border-b border-[var(--border)] pb-2">
+            <h3 className="font-semibold text-xs text-[var(--text-primary)]">Edit Profile Info</h3>
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] p-0.5 rounded transition-colors"
+            >
+              <X size={13} />
+            </button>
+          </div>
+
+          <div className="space-y-2.5 text-xs">
+            <label className="block">
+              <span className="text-[var(--text-secondary)] font-medium">City / Location</span>
+              <input
+                type="text"
+                placeholder="e.g. Bengaluru, India or Remote"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                disabled={busy}
+                className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] px-2.5 py-1.5 text-xs outline-none focus:border-[var(--accent)]"
+              />
+            </label>
+
+            <div className="grid grid-cols-2 gap-2">
+              <label className="block">
+                <span className="text-[var(--text-secondary)] font-medium">Expected CTC</span>
+                <input
+                  type="text"
+                  placeholder="e.g. 25 LPA"
+                  value={expectedCtc}
+                  onChange={(e) => setExpectedCtc(e.target.value)}
+                  disabled={busy}
+                  className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] px-2.5 py-1.5 text-xs outline-none focus:border-[var(--accent)]"
+                />
+              </label>
+
+              <label className="block">
+                <span className="text-[var(--text-secondary)] font-medium">Current CTC</span>
+                <input
+                  type="text"
+                  placeholder="e.g. 18 LPA"
+                  value={currentCtc}
+                  onChange={(e) => setCurrentCtc(e.target.value)}
+                  disabled={busy}
+                  className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] px-2.5 py-1.5 text-xs outline-none focus:border-[var(--accent)]"
+                />
+              </label>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <label className="block">
+                <span className="text-[var(--text-secondary)] font-medium">Notice Period</span>
+                <input
+                  type="text"
+                  placeholder="e.g. Immediate / 30 days"
+                  value={noticePeriod}
+                  onChange={(e) => setNoticePeriod(e.target.value)}
+                  disabled={busy}
+                  className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] px-2.5 py-1.5 text-xs outline-none focus:border-[var(--accent)]"
+                />
+              </label>
+
+              <label className="block">
+                <span className="text-[var(--text-secondary)] font-medium">Experience</span>
+                <input
+                  type="text"
+                  placeholder="e.g. 4 years"
+                  value={experience}
+                  onChange={(e) => setExperience(e.target.value)}
+                  disabled={busy}
+                  className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] px-2.5 py-1.5 text-xs outline-none focus:border-[var(--accent)]"
+                />
+              </label>
+            </div>
+
+            {customFields.length > 0 && (
+              <div className="pt-2 border-t border-[var(--border)] space-y-2">
+                <span className="text-[10px] uppercase font-semibold text-[var(--text-muted)]">
+                  Custom Information
+                </span>
+                {customFields.map((cf, idx) => (
+                  <div key={idx} className="flex items-center gap-1.5">
+                    <input
+                      type="text"
+                      placeholder="Field name"
+                      value={cf.key}
+                      onChange={(e) => updateCustomField(idx, "key", e.target.value)}
+                      disabled={busy}
+                      className="w-1/2 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] px-2 py-1 text-xs outline-none focus:border-[var(--accent)]"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Value"
+                      value={cf.value}
+                      onChange={(e) => updateCustomField(idx, "value", e.target.value)}
+                      disabled={busy}
+                      className="w-1/2 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] px-2 py-1 text-xs outline-none focus:border-[var(--accent)]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeCustomField(idx)}
+                      className="text-[var(--text-muted)] hover:text-[var(--critical)] p-1 rounded transition-colors"
+                      title="Remove field"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={addCustomField}
+              disabled={busy}
+              className="inline-flex items-center gap-1 text-[11px] text-[var(--accent)] hover:underline pt-1"
+            >
+              <Plus size={11} />
+              Add custom field
+            </button>
+          </div>
+
+          {error && (
+            <p role="alert" className="text-xs text-[var(--critical)] leading-relaxed">
+              ✕ {error}
+            </p>
+          )}
+
+          <div className="mt-3 flex items-center gap-2 pt-2 border-t border-[var(--border)]">
+            <button
+              type="submit"
+              disabled={busy}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--text-primary)] text-[var(--plane)] text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {busy ? "Saving..." : "Save details"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              disabled={busy}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] text-xs font-medium hover:border-[var(--border-strong)] transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
     </section>
   );
 }
@@ -394,10 +699,25 @@ function LinksCard({
   const [error, setError] = useState<string | null>(null);
   const [savedNote, setSavedNote] = useState<string | null>(null);
 
+  const rawLinks = stats.links ?? [];
+  const links: SavedLink[] =
+    rawLinks.length > 0
+      ? rawLinks
+      : stats.link
+        ? [
+            {
+              name: stats.default_link_name || "default",
+              url: stats.link,
+              updated_at: new Date().toISOString(),
+              is_default: true,
+            },
+          ]
+        : [];
+
   function startEditing(link?: SavedLink) {
     setName(link?.name ?? "");
     setValue(link?.url ?? "");
-    setMakeDefault(link?.is_default ?? (stats.links ?? []).length === 0);
+    setMakeDefault(link?.is_default ?? links.length === 0);
     setError(null);
     setSavedNote(null);
     setEditing(true);
@@ -451,41 +771,41 @@ function LinksCard({
     <section className="rounded-xl border border-line bg-surface p-5">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <FileText size={15} className="text-ink-2" aria-hidden="true" />
-          <h2 className="font-semibold text-sm">{label} links</h2>
+          <FileText size={15} className="text-[var(--text-secondary)]" aria-hidden="true" />
+          <h2 className="font-semibold text-sm text-[var(--text-primary)]">{label} links</h2>
         </div>
         {!editing && (
           <button
             onClick={() => startEditing()}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-ink-2 hover:text-ink hover:bg-[var(--surface-2)] transition-colors"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-2)] border border-[var(--border)] transition-colors"
           >
-            <Pencil size={11} />
-            Add
+            <Plus size={11} />
+            Add link
           </button>
         )}
       </div>
 
-      <p className="mt-2 text-xs text-ink-3 leading-relaxed">
+      <p className="mt-2 text-xs text-[var(--text-secondary)] leading-relaxed">
         Save multiple versions and choose which one rides along by default. Every
         attached link is wrapped for open tracking.
       </p>
 
       {savedNote && (
-        <p className="mt-3 text-xs leading-relaxed" style={{ color: "var(--good-text, var(--accent))" }}>
-          {savedNote}
+        <p className="mt-3 text-xs leading-relaxed text-[var(--good-text)]">
+          ✓ {savedNote}
         </p>
       )}
       {error && (
-        <p role="alert" className="mt-3 text-xs leading-relaxed" style={{ color: "var(--critical)" }}>
-          x {error}
+        <p role="alert" className="mt-3 text-xs leading-relaxed text-[var(--critical)]">
+          ✕ {error}
         </p>
       )}
 
       {editing && (
-        <form onSubmit={submit} className="mt-4 rounded-xl border border-line bg-[var(--plane)] p-3">
+        <form onSubmit={submit} className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3.5">
           <div className="grid gap-3">
             <label className="block">
-              <span className="text-xs text-ink-3">Name</span>
+              <span className="text-xs font-medium text-[var(--text-secondary)]">Name</span>
               <input
                 type="text"
                 required
@@ -494,11 +814,11 @@ function LinksCard({
                 value={name}
                 onChange={(e) => setName(e.target.value.toLowerCase())}
                 disabled={busy !== null}
-                className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-xs outline-none focus:border-[var(--accent)] disabled:opacity-50"
+                className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] px-3 py-2 text-xs outline-none focus:border-[var(--accent)] disabled:opacity-50"
               />
             </label>
             <label className="block">
-              <span className="text-xs text-ink-3">URL</span>
+              <span className="text-xs font-medium text-[var(--text-secondary)]">URL (Google Drive / hosted link)</span>
               <input
                 type="url"
                 required
@@ -506,10 +826,10 @@ function LinksCard({
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 disabled={busy !== null}
-                className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-xs outline-none focus:border-[var(--accent)] disabled:opacity-50"
+                className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] px-3 py-2 text-xs outline-none focus:border-[var(--accent)] disabled:opacity-50"
               />
             </label>
-            <label className="inline-flex items-center gap-2 text-xs text-ink-2">
+            <label className="inline-flex items-center gap-2 text-xs text-[var(--text-secondary)] cursor-pointer">
               <input
                 type="checkbox"
                 checked={makeDefault}
@@ -519,19 +839,19 @@ function LinksCard({
               Make this the default attached link
             </label>
           </div>
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3.5 flex items-center gap-2">
             <button
               type="submit"
               disabled={busy !== null}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--text-primary)] text-[var(--plane)] text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              {busy === "save" ? "Checking link..." : "Save"}
+              {busy === "save" ? "Checking link..." : "Save link"}
             </button>
             <button
               type="button"
               onClick={() => setEditing(false)}
               disabled={busy !== null}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-[var(--plane)] text-xs font-medium hover:border-[var(--border-strong)] transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] text-xs font-medium hover:border-[var(--border-strong)] transition-colors disabled:opacity-50"
             >
               <X size={11} />
               Cancel
@@ -541,21 +861,33 @@ function LinksCard({
       )}
 
       <ul className="mt-4 space-y-3">
-        {(stats.links ?? []).map((link) => (
-          <li key={link.name} className="rounded-xl border border-line bg-[var(--plane)] p-3">
+        {links.map((link) => (
+          <li key={link.name} className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3.5">
             <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <p className="font-medium text-sm">{link.name}</p>
+                  <p className="font-semibold text-sm text-[var(--text-primary)]">{link.name}</p>
                   {link.is_default && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[var(--surface-2)] px-2 py-0.5 text-[10px] font-semibold text-ink-2">
-                      <Star size={10} />
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[var(--surface)] border border-[var(--border)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-secondary)]">
+                      <Star size={10} className="text-amber-500 fill-amber-500" />
                       default
                     </span>
                   )}
                 </div>
-                <code className="mt-1 block text-xs break-all text-ink-2">{link.url}</code>
-                <p className="mt-1 text-[11px] text-ink-3">
+
+                <div className="mt-2 rounded-lg border border-[var(--border)] bg-[var(--surface)] p-2.5">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--accent)]">
+                      {label} URL
+                    </span>
+                    <CopyButton value={link.url} />
+                  </div>
+                  <code className="block text-xs font-mono font-medium text-[var(--text-primary)] break-all select-all">
+                    {link.url}
+                  </code>
+                </div>
+
+                <p className="mt-1.5 text-[11px] text-[var(--text-muted)]">
                   Updated {formatWhen(link.updated_at)}
                 </p>
               </div>
@@ -565,17 +897,16 @@ function LinksCard({
                 href={link.url}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-surface text-xs font-medium hover:border-[var(--border-strong)] transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] text-xs font-medium hover:bg-[var(--surface-2)] transition-colors"
               >
                 <ExternalLink size={12} />
                 Open
               </a>
-              <CopyButton value={link.url} />
               {!link.is_default && (
                 <button
                   onClick={() => makePrimary(link)}
                   disabled={busy !== null}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-surface text-xs font-medium hover:border-[var(--border-strong)] transition-colors disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] text-xs font-medium hover:bg-[var(--surface-2)] transition-colors disabled:opacity-50"
                 >
                   {busy === `default:${link.name}` ? "Saving..." : "Make default"}
                 </button>
@@ -583,7 +914,7 @@ function LinksCard({
               <button
                 onClick={() => startEditing(link)}
                 disabled={busy !== null}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-surface text-xs font-medium hover:border-[var(--border-strong)] transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] text-xs font-medium hover:bg-[var(--surface-2)] transition-colors disabled:opacity-50"
               >
                 <Pencil size={11} />
                 Edit
@@ -591,7 +922,7 @@ function LinksCard({
               <button
                 onClick={() => remove(link)}
                 disabled={busy !== null}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line bg-surface text-xs font-medium hover:border-[var(--border-strong)] transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--critical)] text-xs font-medium hover:bg-[var(--surface-2)] transition-colors disabled:opacity-50"
               >
                 <Trash2 size={11} />
                 {busy === `delete:${link.name}` ? "Deleting..." : "Delete"}
@@ -601,11 +932,19 @@ function LinksCard({
         ))}
       </ul>
 
-      {!editing && (stats.links ?? []).length === 0 && (
-        <p className="mt-3 text-sm text-ink-2 leading-relaxed">
-          No {label.toLowerCase()} saved yet. Add one here, or ask your assistant:
-          <em className="text-ink"> "Save my {label.toLowerCase()} link"</em>
-        </p>
+      {!editing && links.length === 0 && (
+        <div className="mt-3 rounded-lg border border-dashed border-[var(--border)] p-4 text-center">
+          <p className="text-xs text-[var(--text-secondary)]">
+            No {label.toLowerCase()} link saved yet.
+          </p>
+          <button
+            onClick={() => startEditing()}
+            className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent)] text-white text-xs font-medium hover:opacity-90 transition-opacity"
+          >
+            <Plus size={12} />
+            Add {label} link
+          </button>
+        </div>
       )}
     </section>
   );

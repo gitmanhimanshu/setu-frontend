@@ -154,19 +154,19 @@ export default function FilesCard({
           {files.map((f) => (
             <li
               key={f.id}
-              className="flex items-center gap-3 rounded-lg border border-line bg-[var(--plane)] px-3 py-2.5"
+              className="flex items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2.5"
             >
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium truncate">{f.filename}</p>
-                <p className="text-[11px] text-ink-3 tabular">{readableSize(f.size)}</p>
+                <p className="text-sm font-semibold truncate text-[var(--text-primary)]">{f.filename}</p>
+                <p className="text-[11px] text-[var(--text-muted)] tabular">{readableSize(f.size)}</p>
               </div>
               <a
                 href={fileUrl(f.id)}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="shrink-0 text-xs text-[var(--accent)] hover:underline"
+                className="shrink-0 text-xs font-semibold text-[var(--accent)] hover:underline inline-flex items-center gap-1"
               >
-                Open
+                Open ↗
               </a>
               <button
                 onClick={() => remove(f.id, f.filename)}
