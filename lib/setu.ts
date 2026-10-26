@@ -9,6 +9,7 @@ export type CompanyOpenStat = {
   company: string;
   total_opens: number;
   opened_sends: number;
+  first_opened_at: string | null;
   last_opened_at: string | null;
 };
 

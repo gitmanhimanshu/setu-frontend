@@ -723,8 +723,12 @@ function RecentSends({ stats, token }: { stats: Stats; token: string }) {
               {send.company && <>{send.company} · </>}
               {formatWhen(send.sent_at)}
             </p>
-            <div className="mt-2 flex items-center gap-2">
-              <OpenBadge openCount={send.open_count} lastOpenedAt={send.last_opened_at} />
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <OpenBadge
+                openCount={send.open_count}
+                firstOpenedAt={send.first_opened_at}
+                lastOpenedAt={send.last_opened_at}
+              />
               {send.link_name && (
                 <span className="inline-flex items-center gap-1 text-xs text-ink-3">
                   <FileText size={11} />
@@ -732,6 +736,16 @@ function RecentSends({ stats, token }: { stats: Stats; token: string }) {
                 </span>
               )}
             </div>
+            {send.open_count > 0 && (
+              <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-ink-3">
+                {send.first_opened_at && (
+                  <span>First: <strong className="text-ink-2 font-medium">{formatWhen(send.first_opened_at)}</strong></span>
+                )}
+                {send.last_opened_at && send.open_count > 1 && (
+                  <span>· Last: <strong className="text-ink-2 font-medium">{formatWhen(send.last_opened_at)}</strong></span>
+                )}
+              </div>
+            )}
           </li>
         ))}
       </ul>
@@ -745,8 +759,10 @@ function RecentSends({ stats, token }: { stats: Stats; token: string }) {
               <Th>Subject</Th>
               <Th>Link</Th>
               <Th>Opens</Th>
+              <Th>First open</Th>
+              <Th>Last open</Th>
               <Th>Status</Th>
-              <Th>When</Th>
+              <Th>Sent</Th>
             </tr>
           </thead>
           <tbody>
@@ -765,13 +781,37 @@ function RecentSends({ stats, token }: { stats: Stats; token: string }) {
                   {send.link_name ?? "-"}
                 </td>
                 <td className="px-4 py-3 align-top whitespace-nowrap">
-                  <OpenBadge openCount={send.open_count} lastOpenedAt={send.last_opened_at} />
+                  <OpenBadge
+                    openCount={send.open_count}
+                    firstOpenedAt={send.first_opened_at}
+                    lastOpenedAt={send.last_opened_at}
+                  />
+                </td>
+                <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
+                  {send.first_opened_at ? (
+                    <span title={new Date(send.first_opened_at).toLocaleString()}>
+                      {formatWhen(send.first_opened_at)}
+                    </span>
+                  ) : (
+                    <span className="text-[var(--text-muted)]">-</span>
+                  )}
+                </td>
+                <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
+                  {send.last_opened_at ? (
+                    <span title={new Date(send.last_opened_at).toLocaleString()}>
+                      {formatWhen(send.last_opened_at)}
+                    </span>
+                  ) : (
+                    <span className="text-[var(--text-muted)]">-</span>
+                  )}
                 </td>
                 <td className="px-4 py-3 align-top">
                   <StatusPill ok={send.success} />
                 </td>
                 <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
-                  {formatWhen(send.sent_at)}
+                  <span title={new Date(send.sent_at).toLocaleString()}>
+                    {formatWhen(send.sent_at)}
+                  </span>
                 </td>
               </tr>
             ))}
@@ -903,6 +943,7 @@ function CompanyOpens({ stats, token }: { stats: Stats; token: string }) {
                 </button>
               </th>
               <Th>Opened sends</Th>
+              <Th>First open</Th>
               <th className="px-4 py-2.5 text-left text-xs font-semibold text-ink-2">
                 <button
                   onClick={() => handleSort("latest")}
@@ -924,7 +965,18 @@ function CompanyOpens({ stats, token }: { stats: Stats; token: string }) {
                   {row.opened_sends}
                 </td>
                 <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
-                  {row.last_opened_at ? formatWhen(row.last_opened_at) : "-"}
+                  {row.first_opened_at ? (
+                    <span title={new Date(row.first_opened_at).toLocaleString()}>
+                      {formatWhen(row.first_opened_at)}
+                    </span>
+                  ) : "-"}
+                </td>
+                <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">
+                  {row.last_opened_at ? (
+                    <span title={new Date(row.last_opened_at).toLocaleString()}>
+                      {formatWhen(row.last_opened_at)}
+                    </span>
+                  ) : "-"}
                 </td>
               </tr>
             ))}
@@ -995,10 +1047,12 @@ function EmptyState() {
 
 function OpenBadge({
   openCount,
+  firstOpenedAt,
   lastOpenedAt,
 }: {
   openCount: number;
-  lastOpenedAt: string | null;
+  firstOpenedAt?: string | null;
+  lastOpenedAt?: string | null;
 }) {
   if (openCount <= 0) {
     return (
@@ -1009,7 +1063,14 @@ function OpenBadge({
     );
   }
 
-  const title = lastOpenedAt ? `Last opened ${formatWhen(lastOpenedAt)}` : undefined;
+  const parts: string[] = [];
+  if (firstOpenedAt) {
+    parts.push(`First: ${new Date(firstOpenedAt).toLocaleString()}`);
+  }
+  if (lastOpenedAt && lastOpenedAt !== firstOpenedAt) {
+    parts.push(`Last: ${new Date(lastOpenedAt).toLocaleString()}`);
+  }
+  const title = parts.length > 0 ? parts.join(" · ") : (lastOpenedAt ? `Last opened ${formatWhen(lastOpenedAt)}` : undefined);
 
   return (
     <span
