@@ -346,6 +346,31 @@ function AccountCard({ stats }: { stats: Stats }) {
             {stats.plan === "pro" ? "Unlimited" : `${stats.daily_limit ?? 80} / day`}
           </dd>
         </div>
+        {stats.metadata && Object.keys(stats.metadata).length > 0 && (
+          <div className="pt-2.5 mt-2.5 border-t border-line space-y-2">
+            {stats.metadata.city && (
+              <div className="flex items-center justify-between gap-3 text-xs">
+                <dt className="text-ink-2">City</dt>
+                <dd className="font-medium text-ink">{String(stats.metadata.city)}</dd>
+              </div>
+            )}
+            {stats.metadata.expected_ctc && (
+              <div className="flex items-center justify-between gap-3 text-xs">
+                <dt className="text-ink-2">Expected CTC</dt>
+                <dd className="font-medium text-ink">{String(stats.metadata.expected_ctc)}</dd>
+              </div>
+            )}
+            {Object.entries(stats.metadata)
+              .filter(([k]) => k !== "city" && k !== "expected_ctc")
+              .slice(0, 4)
+              .map(([key, val]) => (
+                <div key={key} className="flex items-center justify-between gap-3 text-xs">
+                  <dt className="text-ink-2 capitalize">{key.replace(/_/g, " ")}</dt>
+                  <dd className="font-medium truncate max-w-[150px]">{String(val)}</dd>
+                </div>
+              ))}
+          </div>
+        )}
       </dl>
     </section>
   );

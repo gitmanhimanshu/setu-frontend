@@ -35,6 +35,7 @@ export type Stats = {
   default_link_name: string | null;
   links: SavedLink[];
   link_label: string | null;
+  metadata?: Record<string, any>;
   plan: string;
   subscribed_at: string | null;
   subscription_ends_at: string | null;
@@ -221,6 +222,21 @@ export async function setDefaultLink(
     body: JSON.stringify({ name }),
   });
   return parseResponse<LinksResponse>(res);
+}
+
+export async function updateProfileMetadata(
+  accessToken: string,
+  metadata: Record<string, any>
+): Promise<{ success: boolean; message?: string; metadata: Record<string, any> }> {
+  const res = await fetch(`${SETU_URL}/api/profile/metadata`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(metadata),
+  });
+  return parseResponse<{ success: boolean; message?: string; metadata: Record<string, any> }>(res);
 }
 
 export function formatWhen(iso: string): string {
