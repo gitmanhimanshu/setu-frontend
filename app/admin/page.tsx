@@ -24,6 +24,10 @@ type AdminUser = {
   name: string | null;
   role: string | null;
   link: string | null;
+  linkedin_url?: string | null;
+  github_url?: string | null;
+  reason_for_job_change?: string | null;
+  extra_data?: string | null;
   plan: string;
   subscribed_at: string | null;
   subscription_ends_at: string | null;
@@ -361,6 +365,33 @@ function Panel({ creds, onLogout }: { creds: string; onLogout: () => void }) {
                       </p>
                       {u.name && (
                         <p className="text-xs text-[var(--text-muted)]">{u.email}</p>
+                      )}
+                      <div className="flex flex-wrap gap-2 mt-1 text-[11px]">
+                        {u.linkedin_url && (
+                          <a
+                            href={u.linkedin_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[var(--accent)] hover:underline inline-flex items-center gap-0.5"
+                          >
+                            LinkedIn
+                          </a>
+                        )}
+                        {u.github_url && (
+                          <a
+                            href={u.github_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[var(--accent)] hover:underline inline-flex items-center gap-0.5"
+                          >
+                            GitHub
+                          </a>
+                        )}
+                      </div>
+                      {u.reason_for_job_change && (
+                        <p className="text-[11px] text-[var(--text-muted)] italic max-w-xs mt-0.5 truncate">
+                          &quot;{u.reason_for_job_change}&quot;
+                        </p>
                       )}
                     </td>
                     <td className="px-4 py-3 align-top whitespace-nowrap text-ink-2">

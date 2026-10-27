@@ -36,6 +36,10 @@ export type Stats = {
   links: SavedLink[];
   link_label: string | null;
   metadata?: Record<string, any>;
+  linkedin_url?: string | null;
+  github_url?: string | null;
+  reason_for_job_change?: string | null;
+  extra_data?: Record<string, any> | null;
   plan: string;
   subscribed_at: string | null;
   subscription_ends_at: string | null;
@@ -74,6 +78,18 @@ export type LinksResponse = {
   default_link_name: string | null;
   link: string | null;
   links: SavedLink[];
+};
+
+export type ProfileResponse = {
+  success?: boolean;
+  linkedin_url?: string | null;
+  github_url?: string | null;
+  reason_for_job_change?: string | null;
+  extra_data?: Record<string, any> | null;
+  role?: string | null;
+  name?: string | null;
+  email?: string;
+  error?: string;
 };
 
 export const SETU_URL =
@@ -237,6 +253,37 @@ export async function updateProfileMetadata(
     body: JSON.stringify(metadata),
   });
   return parseResponse<{ success: boolean; message?: string; metadata: Record<string, any> }>(res);
+}
+
+export async function fetchProfile(
+  accessToken: string
+): Promise<ProfileResponse> {
+  const res = await fetch(`${SETU_URL}/api/profile`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    cache: "no-store",
+  });
+  return parseResponse<ProfileResponse>(res);
+}
+
+export async function updateProfile(
+  accessToken: string,
+  profile: {
+    linkedin_url?: string | null;
+    github_url?: string | null;
+    reason_for_job_change?: string | null;
+    extra_data?: Record<string, any> | null;
+  }
+): Promise<ProfileResponse> {
+  const res = await fetch(`${SETU_URL}/api/profile`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(profile),
+  });
+  return parseResponse<ProfileResponse>(res);
+}
 }
 
 export function formatWhen(iso: string): string {

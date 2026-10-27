@@ -5,8 +5,10 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ArrowRight,
   BadgeCheck,
+  Briefcase,
   ChevronLeft,
   ChevronRight,
+  Code,
   Eye,
   EyeOff,
   ExternalLink,
@@ -20,6 +22,7 @@ import {
   Sparkles,
   Star,
   Trash2,
+  User,
   X,
 } from "lucide-react";
 import Logo from "@/components/Logo";
@@ -36,6 +39,7 @@ import {
   formatWhen,
   saveLink,
   setDefaultLink,
+  updateProfile,
   updateProfileMetadata,
   type SavedLink,
   type Send,
@@ -288,6 +292,7 @@ function Panel({
 
         <aside className="space-y-4 lg:sticky lg:top-24 min-w-0">
           <AccountCard stats={stats} token={token} onSaved={load} />
+          <ProfileCard stats={stats} token={token} onSaved={load} />
           <LinksCard stats={stats} token={token} onSaved={load} />
           <FilesCard token={token} onExpired={onSignOut} />
         </aside>
@@ -676,6 +681,300 @@ function AccountCard({
             </button>
           </div>
         </form>
+      )}
+    </section>
+  );
+}
+
+function LinkedinIcon({ size = 13, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+    </svg>
+  );
+}
+
+function GithubIcon({ size = 13, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+      <path d="M9 18c-4.51 2-5-2-7-2"/>
+    </svg>
+  );
+}
+
+function ProfileCard({
+  stats,
+  token,
+  onSaved,
+}: {
+  stats: Stats;
+  token: string;
+  onSaved: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [linkedin, setLinkedin] = useState(stats.linkedin_url ?? "");
+  const [github, setGithub] = useState(stats.github_url ?? "");
+  const [reason, setReason] = useState(stats.reason_for_job_change ?? "");
+  const [extraJson, setExtraJson] = useState(
+    stats.extra_data && Object.keys(stats.extra_data).length > 0
+      ? JSON.stringify(stats.extra_data, null, 2)
+      : ""
+  );
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [savedNote, setSavedNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!editing) {
+      setLinkedin(stats.linkedin_url ?? "");
+      setGithub(stats.github_url ?? "");
+      setReason(stats.reason_for_job_change ?? "");
+      setExtraJson(
+        stats.extra_data && Object.keys(stats.extra_data).length > 0
+          ? JSON.stringify(stats.extra_data, null, 2)
+          : ""
+      );
+    }
+  }, [stats, editing]);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    setSavedNote(null);
+
+    let parsedExtra: Record<string, any> | null = null;
+    if (extraJson.trim()) {
+      try {
+        parsedExtra = JSON.parse(extraJson.trim());
+        if (typeof parsedExtra !== "object" || parsedExtra === null || Array.isArray(parsedExtra)) {
+          throw new Error('Custom data must be a valid JSON object (e.g. {"skills": ["Python"]})');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Invalid JSON format.");
+        setBusy(false);
+        return;
+      }
+    }
+
+    try {
+      await updateProfile(token, {
+        linkedin_url: linkedin.trim() || null,
+        github_url: github.trim() || null,
+        reason_for_job_change: reason.trim() || null,
+        extra_data: parsedExtra,
+      });
+      setEditing(false);
+      setSavedNote("Profile details saved! Your assistant will use these for outreach.");
+      onSaved();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save profile details.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="rounded-xl border border-line bg-surface p-5">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <User size={15} className="text-ink-2" aria-hidden="true" />
+          <h2 className="font-semibold text-sm">Candidate Profile</h2>
+        </div>
+        {!editing ? (
+          <button
+            onClick={() => {
+              setError(null);
+              setSavedNote(null);
+              setEditing(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-ink-2 hover:text-ink hover:bg-[var(--surface-2)] transition-colors"
+          >
+            <Pencil size={11} />
+            Edit
+          </button>
+        ) : (
+          <button
+            onClick={() => setEditing(false)}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-ink-3 hover:text-ink hover:bg-[var(--surface-2)] transition-colors"
+          >
+            <X size={12} />
+            Cancel
+          </button>
+        )}
+      </div>
+
+      <p className="mt-2 text-xs text-ink-3 leading-relaxed">
+        Personal details used by AI agents to personalize pitches and convey career intent.
+      </p>
+
+      {savedNote && (
+        <p className="mt-3 text-xs leading-relaxed" style={{ color: "var(--good-text, var(--accent))" }}>
+          {savedNote}
+        </p>
+      )}
+      {error && (
+        <p role="alert" className="mt-3 text-xs leading-relaxed" style={{ color: "var(--critical)" }}>
+          x {error}
+        </p>
+      )}
+
+      {editing ? (
+        <form onSubmit={submit} className="mt-4 rounded-xl border border-line bg-[var(--plane)] p-3.5 space-y-3">
+          <label className="block">
+            <span className="text-xs font-medium text-ink-2 flex items-center gap-1.5">
+              <LinkedinIcon size={12} className="text-[#0a66c2]" />
+              LinkedIn URL
+            </span>
+            <input
+              type="url"
+              placeholder="https://linkedin.com/in/username"
+              value={linkedin}
+              onChange={(e) => setLinkedin(e.target.value)}
+              disabled={busy}
+              className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-xs outline-none focus:border-[var(--accent)] disabled:opacity-50"
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-xs font-medium text-ink-2 flex items-center gap-1.5">
+              <GithubIcon size={12} className="text-ink-2" />
+              GitHub URL
+            </span>
+            <input
+              type="url"
+              placeholder="https://github.com/username"
+              value={github}
+              onChange={(e) => setGithub(e.target.value)}
+              disabled={busy}
+              className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-xs outline-none focus:border-[var(--accent)] disabled:opacity-50"
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-xs font-medium text-ink-2 flex items-center gap-1.5">
+              <Briefcase size={12} className="text-ink-2" />
+              Reason for Job Change
+            </span>
+            <textarea
+              rows={2}
+              placeholder="e.g. Seeking high-ownership engineering roles in early-stage products..."
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              disabled={busy}
+              className="mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-xs outline-none focus:border-[var(--accent)] disabled:opacity-50 resize-y"
+            />
+          </label>
+
+          <label className="block">
+            <span className="text-xs font-medium text-ink-2 flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <Code size={12} className="text-ink-2" />
+                Extra Metadata (JSON)
+              </span>
+              <span className="text-[10px] text-ink-3">Optional</span>
+            </span>
+            <textarea
+              rows={3}
+              placeholder={'{\n  "skills": ["TypeScript", "Python"],\n  "target_roles": ["Fullstack"]\n}'}
+              value={extraJson}
+              onChange={(e) => setExtraJson(e.target.value)}
+              disabled={busy}
+              className="mt-1 w-full font-mono rounded-lg border border-line bg-white px-3 py-2 text-[11px] outline-none focus:border-[var(--accent)] disabled:opacity-50"
+            />
+          </label>
+
+          <div className="flex justify-end gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              disabled={busy}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium text-ink-2 hover:bg-[var(--surface-2)] transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={busy}
+              className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-lg bg-[var(--accent)] text-white text-xs font-medium hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50"
+            >
+              {busy ? "Saving..." : "Save details"}
+            </button>
+          </div>
+        </form>
+      ) : (
+        <dl className="mt-4 space-y-3 text-xs">
+          <div className="flex items-start justify-between gap-2 border-b border-line pb-2.5">
+            <dt className="text-ink-3 flex items-center gap-1.5">
+              <LinkedinIcon size={13} className="text-[#0a66c2] shrink-0" />
+              LinkedIn
+            </dt>
+            <dd className="text-right font-medium max-w-[190px] truncate">
+              {stats.linkedin_url ? (
+                <a
+                  href={stats.linkedin_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[var(--accent)] hover:underline inline-flex items-center gap-1 truncate"
+                >
+                  <span className="truncate">{stats.linkedin_url.replace(/^https?:\/\/(www\.)?/, "")}</span>
+                  <ExternalLink size={10} className="shrink-0" />
+                </a>
+              ) : (
+                <span className="text-ink-3">Not set</span>
+              )}
+            </dd>
+          </div>
+
+          <div className="flex items-start justify-between gap-2 border-b border-line pb-2.5">
+            <dt className="text-ink-3 flex items-center gap-1.5">
+              <GithubIcon size={13} className="text-ink-2 shrink-0" />
+              GitHub
+            </dt>
+            <dd className="text-right font-medium max-w-[190px] truncate">
+              {stats.github_url ? (
+                <a
+                  href={stats.github_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[var(--accent)] hover:underline inline-flex items-center gap-1 truncate"
+                >
+                  <span className="truncate">{stats.github_url.replace(/^https?:\/\/(www\.)?/, "")}</span>
+                  <ExternalLink size={10} className="shrink-0" />
+                </a>
+              ) : (
+                <span className="text-ink-3">Not set</span>
+              )}
+            </dd>
+          </div>
+
+          <div className="border-b border-line pb-2.5">
+            <dt className="text-ink-3 flex items-center gap-1.5 mb-1">
+              <Briefcase size={13} className="text-ink-2 shrink-0" />
+              Reason for job change
+            </dt>
+            <dd className="font-normal text-ink-2 italic bg-[var(--surface-2)] rounded-md px-2.5 py-1.5 leading-relaxed text-[11px]">
+              {stats.reason_for_job_change ? `"${stats.reason_for_job_change}"` : <span className="not-italic text-ink-3">Not specified yet</span>}
+            </dd>
+          </div>
+
+          <div>
+            <dt className="text-ink-3 flex items-center gap-1.5 mb-1">
+              <Code size={13} className="text-ink-2 shrink-0" />
+              Custom metadata
+            </dt>
+            <dd>
+              {stats.extra_data && Object.keys(stats.extra_data).length > 0 ? (
+                <pre className="font-mono text-[10px] bg-[var(--surface-2)] p-2 rounded-md overflow-x-auto max-h-28 text-ink-2 leading-tight">
+                  {JSON.stringify(stats.extra_data, null, 2)}
+                </pre>
+              ) : (
+                <span className="text-ink-3 text-[11px]">None</span>
+              )}
+            </dd>
+          </div>
+        </dl>
       )}
     </section>
   );
