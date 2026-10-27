@@ -31,8 +31,8 @@ export default function ApiPage() {
           <Link href="/docs/tools" className="text-[var(--accent)] hover:underline">
             Tools
           </Link>
-          , not this page. There is exactly one REST endpoint, and it exists to
-          feed the dashboard.
+          , not this page. The REST endpoints exist primarily to feed the
+          dashboard and candidate profile management.
         </p>
 
         <section className="mt-12">
@@ -62,7 +62,17 @@ export default function ApiPage() {
                 <Row
                   method="GET"
                   path="/api/stats"
-                  desc="Your profile and send history, for the dashboard. Bearer token = a Google access token."
+                  desc="Your profile, link engagement, and send history for the dashboard. Bearer token = a Google access token."
+                />
+                <Row
+                  method="GET"
+                  path="/api/profile"
+                  desc="Candidate outreach profile: LinkedIn URL, GitHub URL, reason for job change, and custom JSON metadata."
+                />
+                <Row
+                  method="POST"
+                  path="/api/profile"
+                  desc="Update candidate outreach profile fields (linkedin_url, github_url, reason_for_job_change, extra_data)."
                 />
                 <Row
                   method="GET"
@@ -116,7 +126,16 @@ export default function ApiPage() {
               code={`{
   "email": "you@gmail.com",
   "name": "Himanshu Yadav",
-  "resume_link": "https://drive.google.com/file/d/…",
+  "role": "software_engineer",
+  "link": "https://drive.google.com/file/d/…",
+  "linkedin_url": "https://linkedin.com/in/himanshu",
+  "github_url": "https://github.com/himanshu",
+  "reason_for_job_change": "Seeking high-growth backend systems role",
+  "extra_data": {
+    "primary_skills": "Python, FastAPI, Postgres, Go",
+    "years_of_experience": 4,
+    "notice_period": "30 days"
+  },
   "total_sent": 42,
   "total_failed": 1,
   "sent_last_24h": 12,
@@ -152,6 +171,71 @@ export default function ApiPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </section>
+
+        <section className="mt-12">
+          <h2 className="text-2xl font-semibold tracking-tight">
+            GET & POST /api/profile
+          </h2>
+          <p className="mt-3 text-[var(--text-secondary)] leading-relaxed">
+            Manage candidate outreach profile fields: LinkedIn URL, GitHub URL,
+            reason for job change, and custom metadata (<Code>extra_data</Code>).
+            Setu embeds these into prompt context so LLM agents craft personalised,
+            compelling applications.
+          </p>
+
+          <h3 className="mt-6 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+            Read profile (GET)
+          </h3>
+          <div className="mt-2">
+            <CodeBlock
+              lang="bash"
+              code={`curl ${SETU_URL}/api/profile \\
+  -H "Authorization: Bearer <google_access_token>"`}
+            />
+          </div>
+
+          <h3 className="mt-6 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+            Update profile (POST)
+          </h3>
+          <div className="mt-2">
+            <CodeBlock
+              lang="bash"
+              code={`curl -X POST ${SETU_URL}/api/profile \\
+  -H "Authorization: Bearer <google_access_token>" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "linkedin_url": "https://linkedin.com/in/himanshu",
+    "github_url": "https://github.com/himanshu",
+    "reason_for_job_change": "Exploring senior backend engineering opportunities",
+    "extra_data": {
+      "notice_period": "30 days",
+      "expected_ctc": "25 LPA",
+      "preferred_locations": ["Bangalore", "Remote"]
+    }
+  }'`}
+            />
+          </div>
+
+          <h3 className="mt-6 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+            Response
+          </h3>
+          <div className="mt-2">
+            <CodeBlock
+              lang="json"
+              code={`{
+  "success": true,
+  "linkedin_url": "https://linkedin.com/in/himanshu",
+  "github_url": "https://github.com/himanshu",
+  "reason_for_job_change": "Exploring senior backend engineering opportunities",
+  "extra_data": {
+    "notice_period": "30 days",
+    "expected_ctc": "25 LPA",
+    "preferred_locations": ["Bangalore", "Remote"]
+  }
+}`}
+            />
           </div>
         </section>
 

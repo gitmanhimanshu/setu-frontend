@@ -11,6 +11,8 @@ Setu is an AI-powered Model Context Protocol (MCP) server that lets Claude, Chat
 - **Paced Sending:** Adds a 5-second gap between emails by default so Gmail doesn't flag it as automation.
 - **Rate Limits:** Enforced by the server—80 emails per day and 25 per batch call.
 - **Link Verification:** Requires a publicly accessible link (e.g., Google Drive Resume). Setu verifies the link is public before sending to prevent broken applications.
+- **Link Tracking:** Auto-wraps links in vanity tracking paths with responsive fallback pages if tracking expires.
+- **Profile Personalization:** Store candidate profile details (LinkedIn URL, GitHub URL, Reason for job change, skills, and custom metadata) for hyper-personalized outreach.
 - **Duplicate Prevention:** Setu logs sent emails and prevents duplicate sends.
 - **Roles:** You can set your role as `job_seeker` (requires resume), `recruiter` (JD optional), or `professional` (portfolio optional).
 
@@ -25,13 +27,19 @@ URL: `https://api.mimanasa.online/mcp`
 
 ## MCP Tools Provided
 Setu provides the following tools to the AI assistant:
-1. `get_my_profile`: Fetch user profile, role, saved link, plan, and remaining quota.
-2. `set_role`: Set the user's role (`job_seeker`, `recruiter`, `professional`).
-3. `save_link`: Saves the URL appended to every email (e.g., resume).
-4. `verify_hr_emails`: Checks if an address's domain can actually receive mail (MX records).
-5. `send_application`: Sends one email from Gmail.
-6. `send_applications`: Sends a batch of emails (max 25).
-7. `get_sent_history`: Retrieves the user's send history to avoid duplicates.
+1. `get_my_profile`: Fetch user profile, role, saved link, plan, remaining quota, LinkedIn, GitHub, reason for job change, and extra metadata.
+2. `update_profile`: Updates candidate outreach fields: `linkedin_url`, `github_url`, `reason_for_job_change`, and `extra_data` (JSON metadata).
+3. `set_role`: Set the user's role (`job_seeker`, `recruiter`, `professional`).
+4. `save_link`: Saves the URL appended to every email (e.g., resume).
+5. `list_saved_links`: Lists all saved links for the user.
+6. `set_default_link`: Sets which saved link is appended by default.
+7. `delete_link`: Deletes a saved link.
+8. `verify_hr_emails`: Checks if recipient domains have valid MX records and can receive mail.
+9. `send_application`: Sends one personalized email from Gmail.
+10. `send_applications`: Sends a batch of emails (max 25) with paced delays.
+11. `get_sent_history`: Retrieves the user's send history to avoid duplicates.
+12. `get_my_stats`: Returns account statistics, send counts, and company open tracking.
+13. `get_link_activity`: Inspects real-time click and open activity for tracked links.
 
 ## Pricing
 - **Free Plan:** First 5 successful emails are free to test.

@@ -189,6 +189,36 @@ export default function Docs() {
           </Note>
         </section>
 
+        {/* Profile & Personalization */}
+        <section id="profile" className="mt-14 scroll-mt-20">
+          <h2 className="text-2xl font-semibold tracking-tight">
+            Personalize your outreach profile
+          </h2>
+          <p className="mt-3 text-[var(--text-secondary)] leading-relaxed">
+            Your assistant writes far more convincing, high-response pitches when it knows who you are, your reason for switching jobs, and your public profiles (LinkedIn and GitHub).
+          </p>
+          <p className="mt-3 text-[var(--text-secondary)] leading-relaxed">
+            You can configure your LinkedIn, GitHub, reason for job change, and custom background metadata in the{" "}
+            <Link href="/dashboard" className="text-[var(--accent)] hover:underline">
+              Dashboard
+            </Link>{" "}
+            or by asking your assistant directly in chat:
+          </p>
+          <div className="mt-4">
+            <CodeBlock
+              lang="prompt"
+              code={`Update my profile details:
+- LinkedIn: https://linkedin.com/in/username
+- GitHub: https://github.com/username
+- Reason for job change: Looking for senior backend engineering roles with high agency in fast-moving teams.
+- Skills: Go, Python, PostgreSQL, Distributed Systems`}
+            />
+          </div>
+          <p className="mt-4 text-sm text-[var(--text-secondary)] leading-relaxed">
+            These details are returned by <Code>get_my_profile</Code> on every run so the assistant automatically incorporates your background and intent without you having to re-explain it.
+          </p>
+        </section>
+
         {/* Usage */}
         <section id="usage" className="mt-14 scroll-mt-20">
           <h2 className="text-2xl font-semibold tracking-tight">Using it</h2>

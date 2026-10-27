@@ -7,7 +7,7 @@ import { TOOLS } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Tools",
   description:
-    "The six MCP tools Setu exposes: profile, resume link, address verification, single and batch sending, and history.",
+    "The MCP tools Setu exposes: profile management, resume & portfolio links, address verification, single and batch sending, and history.",
 };
 
 export default function ToolsPage() {
@@ -16,7 +16,7 @@ export default function ToolsPage() {
       <article className="max-w-2xl">
         <h1 className="text-4xl font-semibold tracking-tight">Tools</h1>
         <p className="mt-4 text-lg text-[var(--text-secondary)] leading-relaxed">
-          Setu exposes six tools. Your assistant decides when to call them — you
+          Setu exposes MCP tools for profile personalization, link management, address verification, and paced email delivery. Your assistant decides when to call them — you
           never invoke these by hand.
         </p>
 

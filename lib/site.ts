@@ -95,10 +95,10 @@ export const TOOLS: Tool[] = [
   {
     name: "get_my_profile",
     purpose:
-      "Who you are, your role, saved link, plan, and remaining quota. The assistant should call this first — everything else depends on it.",
+      "Who you are, your role, saved links, profile details (LinkedIn, GitHub, reason for job change, custom metadata), plan, and remaining quota. The assistant should call this first — everything else depends on it.",
     input: [],
     output:
-      "email, name, role, link, default_link_name, links[], link_saved, link_required, plan, subscribed_at, subscription_ends_at, total_sent, free_remaining, sent_last_24h, daily_limit, remaining_today, setup_needed",
+      "email, name, role, link, default_link_name, links[], link_saved, link_required, linkedin_url, github_url, reason_for_job_change, extra_data, plan, subscribed_at, subscription_ends_at, total_sent, free_remaining, sent_last_24h, daily_limit, remaining_today, setup_needed",
     example: `{
   "email": "you@gmail.com",
   "name": "Himanshu Yadav",
@@ -108,6 +108,13 @@ export const TOOLS: Tool[] = [
   "link_label": "Resume",
   "link_saved": true,
   "link_required": true,
+  "linkedin_url": "https://linkedin.com/in/himanshu",
+  "github_url": "https://github.com/gitmanhimanshu",
+  "reason_for_job_change": "Looking for high-ownership senior engineering roles",
+  "extra_data": {
+    "skills": ["Python", "FastAPI", "React"],
+    "target_roles": ["Senior Fullstack Engineer"]
+  },
   "plan": "free",
   "total_sent": 3,
   "free_email_limit": 5,
@@ -116,6 +123,48 @@ export const TOOLS: Tool[] = [
   "daily_limit": 80,
   "remaining_today": 77,
   "setup_needed": null
+}`,
+  },
+  {
+    name: "update_profile",
+    purpose:
+      "Updates candidate or outreach details: LinkedIn profile URL, GitHub URL, reason for job change, or custom metadata (JSON) like skills and target roles. The assistant uses this context to write personalized outreach emails.",
+    input: [
+      {
+        name: "linkedin_url",
+        type: "string",
+        required: false,
+        desc: "Public LinkedIn profile URL (https://linkedin.com/in/...)",
+      },
+      {
+        name: "github_url",
+        type: "string",
+        required: false,
+        desc: "Public GitHub profile URL (https://github.com/...)",
+      },
+      {
+        name: "reason_for_job_change",
+        type: "string",
+        required: false,
+        desc: "Why you are exploring new roles and what opportunities you are looking for",
+      },
+      {
+        name: "extra_data",
+        type: "dict",
+        required: false,
+        desc: "Key-value JSON object of skills, preferences, or custom background notes",
+      },
+    ],
+    output: "success, linkedin_url, github_url, reason_for_job_change, extra_data",
+    example: `{
+  "success": true,
+  "linkedin_url": "https://linkedin.com/in/himanshu",
+  "github_url": "https://github.com/gitmanhimanshu",
+  "reason_for_job_change": "Seeking high-ownership engineering roles in early-stage products",
+  "extra_data": {
+    "skills": ["Python", "TypeScript", "Next.js"],
+    "preferred_location": "Remote"
+  }
 }`,
   },
   {
@@ -401,7 +450,7 @@ export const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Does Setu store my Google password or tokens?",
-    a: "Neither. There is no password (Google handles login), and no token is stored — the OAuth layer supplies a fresh one per request. The database holds your email, name, resume link, and send history. Nothing else.",
+    a: "Neither. There is no password (Google handles login), and no token is stored — the OAuth layer supplies a fresh one per request. The database only holds your outreach profile (name, email, saved links, optional LinkedIn/GitHub links, job change reason, custom metadata) and send history. Nothing else.",
   },
   {
     q: "Is my resume uploaded to your server?",
