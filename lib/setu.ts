@@ -284,7 +284,6 @@ export async function updateProfile(
   });
   return parseResponse<ProfileResponse>(res);
 }
-}
 
 export function formatWhen(iso: string): string {
   const then = new Date(iso).getTime();
