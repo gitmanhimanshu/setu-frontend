@@ -251,55 +251,60 @@ export default function Home() {
         <Reveal>
           <div className="flex flex-col items-center text-center">
             {/* Connection Pipeline */}
-            <div className="flex flex-wrap items-center justify-center gap-4 px-6 py-4 rounded-2xl bg-white dark:bg-black border border-[var(--border-strong)] mb-10 shadow-lg max-w-full font-bold text-lg">
-              
+            <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 px-4 sm:px-6 py-4 rounded-2xl bg-white/80 dark:bg-black/60 backdrop-blur-md border border-[var(--border-strong)] mb-10 shadow-lg max-w-full">
               {/* Firecrawl */}
-              <div className="flex items-center" title="Firecrawl">
-                <span className="text-[#ff4f00] flex items-center justify-center bg-[#ff4f00]/10 p-2 rounded-full">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                </span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs" title="Firecrawl - Web scraping for LLMs">
+                <FirecrawlLogo size={22} />
+                <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">Firecrawl</span>
               </div>
-              <span className="text-gray-400 font-light">+</span>
+              <span className="text-[var(--text-muted)] font-mono text-base font-medium select-none">+</span>
+
+              {/* Exa AI */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs" title="Exa AI - Search engine for AI agents">
+                <ExaLogo size={22} />
+                <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">Exa AI</span>
+              </div>
+              <span className="text-[var(--text-muted)] font-mono text-base font-medium select-none">+</span>
+
+              {/* Parallel Search */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs" title="Parallel Search - AI web search system">
+                <ParallelLogo size={22} />
+                <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">Parallel</span>
+              </div>
+              <span className="text-[var(--text-muted)] font-mono text-base font-medium select-none">+</span>
 
               {/* LinkedIn */}
-              <div className="flex items-center" title="LinkedIn">
-                <span className="text-[#0a66c2] flex items-center justify-center bg-[#0a66c2]/10 p-2 rounded-full">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                </span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs" title="LinkedIn Jobs">
+                <LinkedInLogo size={22} />
+                <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">LinkedIn</span>
               </div>
-              <span className="text-gray-400 font-light">+</span>
+              <span className="text-[var(--text-muted)] font-mono text-base font-medium select-none">+</span>
 
               {/* Naukri */}
-              <div className="flex items-center" title="Naukri">
-                <span className="text-[#f16522] flex items-center justify-center bg-[#f16522]/10 p-2 rounded-full">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                </span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs" title="Naukri.com">
+                <NaukriLogo size={22} />
+                <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">Naukri</span>
               </div>
-              <span className="text-gray-400 font-light">+</span>
+              <span className="text-[var(--text-muted)] font-mono text-base font-medium select-none">+</span>
 
               {/* Indeed */}
-              <div className="flex items-center" title="Indeed">
-                <span className="text-[#2164f4] flex items-center justify-center bg-[#2164f4]/10 p-2 rounded-full">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M11.996 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12 12 12 0 0 0-12-12zm-3.2 17.6H5.6V8.8h3.2v8.8zm-.2-10.4a1.8 1.8 0 1 1 .001-3.601A1.8 1.8 0 0 1 8.6 7.2zm9.8 10.4h-3.2v-4.8c0-1.14-.02-2.6-1.58-2.6-1.58 0-1.82 1.24-1.82 2.52v4.88H8.6V8.8h3.08v1.2h.04c.42-.8 1.46-1.64 3-1.64 3.2 0 3.8 2.1 3.8 4.84v4.4z"/></svg>
-                </span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs" title="Indeed">
+                <IndeedLogo size={22} />
+                <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">Indeed</span>
               </div>
-              <span className="text-gray-400 font-light">+</span>
+              <span className="text-[var(--text-muted)] font-mono text-base font-medium select-none">+</span>
 
               {/* Setu */}
-              <div className="flex items-center gap-2" title="Setu MCP">
-                <span className="text-blue-600 dark:text-blue-400 font-extrabold text-2xl flex items-center gap-2 tracking-wide px-3">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-                  SETU
-                </span>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[var(--accent-soft)] border border-[var(--accent)]/30 shadow-xs" title="Setu MCP Server">
+                <Logo size={22} />
+                <span className="text-xs sm:text-sm font-bold tracking-wide text-[var(--accent)]">SETU</span>
               </div>
-              <span className="text-gray-400 font-light">=</span>
+              <span className="text-[var(--text-muted)] font-mono text-lg font-bold select-none">=</span>
 
               {/* Dream Job */}
-              <div className="flex items-center gap-2">
-                <span className="text-green-600 flex items-center gap-1 bg-green-50 dark:bg-green-900/20 px-3 py-1 rounded-lg">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"/></svg>
-                  Your Dream Job
-                </span>
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 shadow-xs">
+                <Sparkles size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="text-xs sm:text-sm font-bold tracking-tight">Your Dream Job</span>
               </div>
             </div>
 
@@ -307,7 +312,13 @@ export default function Home() {
               Automate your entire job hunt
             </h2>
             <p className="mt-6 text-lg text-[var(--text-secondary)] max-w-3xl leading-relaxed">
-              Setu bridges the gap between job portals and your inbox. Use <strong>Firecrawl</strong> and LLMs to scrape job requirements and extract recruiter emails directly from LinkedIn, Naukri, and Indeed. Then, let Setu instantly generate and send the perfect, highly-personalized application on your behalf.
+              Setu bridges the gap between AI search engines, job portals, and your inbox. Use{" "}
+              <strong className="text-[var(--text-primary)]">Firecrawl</strong>,{" "}
+              <strong className="text-[var(--text-primary)]">Exa AI</strong>, and{" "}
+              <strong className="text-[var(--text-primary)]">Parallel Search</strong> with your LLM to scout openings, scrape live job requirements, and extract recruiter emails directly from{" "}
+              <strong className="text-[var(--text-primary)]">LinkedIn</strong>,{" "}
+              <strong className="text-[var(--text-primary)]">Naukri</strong>, and{" "}
+              <strong className="text-[var(--text-primary)]">Indeed</strong>. Then, let Setu instantly generate and send the perfect, highly-personalized application on your behalf.
             </p>
           </div>
         </Reveal>
@@ -617,6 +628,93 @@ function GithubMark() {
   return (
     <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
       <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z" />
+    </svg>
+  );
+}
+
+function FirecrawlLogo({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className="shrink-0" aria-label="Firecrawl">
+      <path
+        d="M12.001 2C11.666 4.667 9.8 6.9 8.2 9.2c-1.8 2.587-2.6 5.253-1.6 8.267.933 2.8 3.2 4.533 6.133 4.533 3.867 0 6.667-2.8 6.667-6.533 0-4.134-3.334-6.934-4.8-10.4C14.001 3.733 13.067 2.8 12.001 2z"
+        fill="#FF5722"
+      />
+      <path
+        d="M12.4 11.2c-.267 1.467-.933 2.667-1.867 3.733-1.067 1.2-1.467 2.4-1.067 3.867.4 1.467 1.467 2.4 2.934 2.4 2 0 3.6-1.6 3.6-3.6 0-2.267-1.867-3.867-2.667-5.8-.4-.4-.667-.667-.933-.6z"
+        fill="#FFB300"
+      />
+    </svg>
+  );
+}
+
+function ExaLogo({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className="shrink-0" aria-label="Exa AI">
+      <rect width="24" height="24" rx="6" fill="#4F46E5" fillOpacity="0.15" />
+      <path
+        d="M12 3.5L13.3 9.2L19 7L14.7 11.3L20.5 12L14.7 12.7L19 17L13.3 14.8L12 20.5L10.7 14.8L5 17L9.3 12.7L3.5 12L9.3 11.3L5 7L10.7 9.2L12 3.5Z"
+        fill="#4F46E5"
+        className="dark:fill-indigo-400"
+      />
+      <circle cx="12" cy="12" r="2.2" fill="#818CF8" />
+    </svg>
+  );
+}
+
+function ParallelLogo({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className="shrink-0" aria-label="Parallel Search">
+      <rect width="24" height="24" rx="6" fill="#9333EA" fillOpacity="0.15" />
+      <path
+        d="M9.5 5.5L6.5 18.5M17.5 5.5L14.5 18.5"
+        stroke="#9333EA"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        className="dark:stroke-purple-400"
+      />
+      <circle cx="9.5" cy="5.5" r="1.5" fill="#A855F7" />
+      <circle cx="14.5" cy="18.5" r="1.5" fill="#A855F7" />
+    </svg>
+  );
+}
+
+function LinkedInLogo({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className="shrink-0" aria-label="LinkedIn">
+      <rect width="24" height="24" rx="5" fill="#0A66C2" />
+      <path
+        d="M19 19h-2.9v-4.5c0-1.1-.02-2.5-1.5-2.5-1.5 0-1.7 1.2-1.7 2.4V19H10V9.6h2.8v1.3h.04c.39-.74 1.34-1.52 2.76-1.52 2.95 0 3.5 1.94 3.5 4.47V19zM6.7 8.3c-.93 0-1.68-.76-1.68-1.69 0-.93.75-1.69 1.68-1.69.93 0 1.69.76 1.69 1.69 0 .93-.76 1.69-1.69 1.69zm1.45 10.7h-2.9V9.6h2.9V19z"
+        fill="white"
+      />
+    </svg>
+  );
+}
+
+function NaukriLogo({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className="shrink-0" aria-label="Naukri">
+      <rect width="24" height="24" rx="5" fill="#0078DB" />
+      <path
+        d="M6.5 18V6l6 7.5V6h3v12l-6-7.5V18H6.5z"
+        fill="white"
+      />
+      <circle cx="17.2" cy="6.8" r="1.8" fill="#F16522" />
+    </svg>
+  );
+}
+
+function IndeedLogo({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className="shrink-0" aria-label="Indeed">
+      <rect width="24" height="24" rx="5" fill="#2164F4" />
+      <path
+        d="M9.8 18.5H7.5V10h2.3v8.5zm-.1-10.2c-.8 0-1.4-.6-1.4-1.4 0-.8.6-1.4 1.4-1.4.8 0 1.4.6 1.4 1.4 0 .8-.6 1.4-1.4 1.4zm7.6 10.2h-2.3v-4.3c0-1.1-.4-1.8-1.4-1.8-.8 0-1.2.5-1.4 1-.1.2-.1.5-.1.8v4.3H9.8V10h2.2v1.2h.03c.3-.6 1.1-1.4 2.4-1.4 1.7 0 2.9 1.1 2.9 3.5v5.2z"
+        fill="white"
+      />
+      <path
+        d="M17.5 5.5c-.8.5-1.9.9-3.2 1.1-.4.1-.7.1-1.1.1 0 0 .5-.9 1.4-1.4.8-.5 1.8-.7 2.9-.7v.9z"
+        fill="#FFD54F"
+      />
     </svg>
   );
 }
