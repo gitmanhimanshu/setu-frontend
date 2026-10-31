@@ -251,60 +251,60 @@ export default function Home() {
         <Reveal>
           <div className="flex flex-col items-center text-center">
             {/* Connection Pipeline */}
-            <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 px-4 sm:px-6 py-4 rounded-2xl bg-white/80 dark:bg-black/60 backdrop-blur-md border border-[var(--border-strong)] mb-10 shadow-lg max-w-full">
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 px-4 sm:px-6 py-3.5 rounded-2xl bg-[var(--surface)] border border-[var(--border-strong)] mb-10 shadow-[var(--shadow-sm)] max-w-full">
               {/* Firecrawl */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs" title="Firecrawl - Web scraping for LLMs">
-                <FirecrawlLogo size={22} />
-                <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">Firecrawl</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-all shadow-xs" title="Firecrawl - Web scraping for LLMs">
+                <FirecrawlLogo size={20} />
+                <span className="text-xs sm:text-sm font-semibold">Firecrawl</span>
               </div>
-              <span className="text-[var(--text-muted)] font-mono text-base font-medium select-none">+</span>
+              <span className="text-[var(--text-muted)] font-mono text-base font-semibold select-none">+</span>
 
               {/* Exa AI */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs" title="Exa AI - Search engine for AI agents">
-                <ExaLogo size={22} />
-                <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">Exa AI</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-all shadow-xs" title="Exa AI - Search engine for AI agents">
+                <ExaLogo size={20} />
+                <span className="text-xs sm:text-sm font-semibold">Exa AI</span>
               </div>
-              <span className="text-[var(--text-muted)] font-mono text-base font-medium select-none">+</span>
+              <span className="text-[var(--text-muted)] font-mono text-base font-semibold select-none">+</span>
 
               {/* Parallel Search */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs" title="Parallel Search - AI web search system">
-                <ParallelLogo size={22} />
-                <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">Parallel</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-all shadow-xs" title="Parallel Search - AI web search system">
+                <ParallelLogo size={20} />
+                <span className="text-xs sm:text-sm font-semibold">Parallel</span>
               </div>
-              <span className="text-[var(--text-muted)] font-mono text-base font-medium select-none">+</span>
+              <span className="text-[var(--text-muted)] font-mono text-base font-semibold select-none">+</span>
 
               {/* LinkedIn */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs" title="LinkedIn Jobs">
-                <LinkedInLogo size={22} />
-                <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">LinkedIn</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-all shadow-xs" title="LinkedIn Jobs">
+                <LinkedInLogo size={20} />
+                <span className="text-xs sm:text-sm font-semibold">LinkedIn</span>
               </div>
-              <span className="text-[var(--text-muted)] font-mono text-base font-medium select-none">+</span>
+              <span className="text-[var(--text-muted)] font-mono text-base font-semibold select-none">+</span>
 
               {/* Naukri */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs" title="Naukri.com">
-                <NaukriLogo size={22} />
-                <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">Naukri</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-all shadow-xs" title="Naukri.com">
+                <NaukriLogo size={20} />
+                <span className="text-xs sm:text-sm font-semibold">Naukri</span>
               </div>
-              <span className="text-[var(--text-muted)] font-mono text-base font-medium select-none">+</span>
+              <span className="text-[var(--text-muted)] font-mono text-base font-semibold select-none">+</span>
 
               {/* Indeed */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-xs" title="Indeed">
-                <IndeedLogo size={22} />
-                <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">Indeed</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-all shadow-xs" title="Indeed">
+                <IndeedLogo size={20} />
+                <span className="text-xs sm:text-sm font-semibold">Indeed</span>
               </div>
-              <span className="text-[var(--text-muted)] font-mono text-base font-medium select-none">+</span>
 
-              {/* Setu */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[var(--accent-soft)] border border-[var(--accent)]/30 shadow-xs" title="Setu MCP Server">
-                <Logo size={22} />
-                <span className="text-xs sm:text-sm font-bold tracking-wide text-[var(--accent)]">SETU</span>
-              </div>
-              <span className="text-[var(--text-muted)] font-mono text-lg font-bold select-none">=</span>
-
-              {/* Dream Job */}
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 shadow-xs">
-                <Sparkles size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span className="text-xs sm:text-sm font-bold tracking-tight">Your Dream Job</span>
+              {/* Engine & Destination grouped together so '=' never wraps lonely */}
+              <div className="inline-flex items-center gap-2 sm:gap-2.5">
+                <span className="text-[var(--text-muted)] font-mono text-base font-semibold select-none">+</span>
+                <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl bg-[var(--accent-soft)] border border-[var(--accent)]/30 text-[var(--accent)] shadow-xs" title="Setu MCP Server">
+                  <Logo size={20} />
+                  <span className="text-xs sm:text-sm font-bold tracking-wide">SETU</span>
+                </div>
+                <span className="text-[var(--text-muted)] font-mono text-base font-bold select-none">=</span>
+                <div className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl bg-[rgba(12,163,12,0.12)] border border-[rgba(12,163,12,0.28)] text-[var(--good-text)] shadow-xs">
+                  <Sparkles size={15} className="text-[var(--good-text)] shrink-0" />
+                  <span className="text-xs sm:text-sm font-bold tracking-tight">Your Dream Job</span>
+                </div>
               </div>
             </div>
 
@@ -654,7 +654,6 @@ function ExaLogo({ size = 22 }: { size?: number }) {
       <path
         d="M12 3.5L13.3 9.2L19 7L14.7 11.3L20.5 12L14.7 12.7L19 17L13.3 14.8L12 20.5L10.7 14.8L5 17L9.3 12.7L3.5 12L9.3 11.3L5 7L10.7 9.2L12 3.5Z"
         fill="#4F46E5"
-        className="dark:fill-indigo-400"
       />
       <circle cx="12" cy="12" r="2.2" fill="#818CF8" />
     </svg>
@@ -670,7 +669,6 @@ function ParallelLogo({ size = 22 }: { size?: number }) {
         stroke="#9333EA"
         strokeWidth="2.5"
         strokeLinecap="round"
-        className="dark:stroke-purple-400"
       />
       <circle cx="9.5" cy="5.5" r="1.5" fill="#A855F7" />
       <circle cx="14.5" cy="18.5" r="1.5" fill="#A855F7" />
